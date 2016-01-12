@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
+import vn.hoangphan.karafind.models.DataLink;
+
 /**
  * Created by eastagile-tc on 1/12/16.
  */
@@ -21,26 +23,5 @@ public class DataLinksResponse {
 
     public void setDataLinks(List<DataLink> dataLinks) {
         this.dataLinks = dataLinks;
-    }
-
-    public static class DataLink {
-        private int vol;
-        private String link;
-
-        public int getVol() {
-            return vol;
-        }
-
-        public void setVol(int vol) {
-            this.vol = vol;
-        }
-
-        public String getLink() {
-            return link;
-        }
-
-        public void setLink(String link) {
-            this.link = link;
-        }
     }
 }
