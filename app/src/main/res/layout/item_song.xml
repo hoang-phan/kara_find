@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="10dp">
+    <TextView
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:layout_height="match_parent"
+        android:text="SONGID"
+        android:textStyle="bold"
+        android:textSize="@dimen/song_id_text_size"
+        android:id="@+id/tv_song_id"/>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical"
+        android:layout_height="match_parent">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:text="Song's name goes here"
+            android:textSize="@dimen/song_name_text_size"
+            android:id="@+id/tv_song_name"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/song_lyric_text_size"
+            android:text="Short lyric goes here"
+            android:id="@+id/tv_song_lyric"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/song_author_text_size"
+            android:textStyle="italic"
+            android:text="Author"
+            android:layout_marginTop="2dp"
+            android:id="@+id/tv_song_author"/>
+    </LinearLayout>
+    <ImageView
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_gravity="end|center_vertical"
+        android:src="@android:drawable/star_big_off"
+        android:id="@+id/iv_song_favorite"/>
+</LinearLayout>

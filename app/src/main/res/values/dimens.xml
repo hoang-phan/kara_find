@@ -2,4 +2,9 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="icn_search_margin_right">5dp</dimen>
+    <dimen name="song_id_text_size">22sp</dimen>
+    <dimen name="song_name_text_size">17sp</dimen>
+    <dimen name="song_lyric_text_size">14sp</dimen>
+    <dimen name="song_author_text_size">12sp</dimen>
 </resources>
