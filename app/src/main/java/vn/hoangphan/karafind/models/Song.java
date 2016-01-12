@@ -21,6 +21,8 @@ public class Song {
         this.favorited = favorited;
     }
 
+    public Song() { }
+
     public String getName() {
         return name;
     }
