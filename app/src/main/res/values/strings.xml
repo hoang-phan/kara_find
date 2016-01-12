@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Kara Find</string>
+    <string name="search">Search</string>
+    <string name="update">Update</string>
 </resources>

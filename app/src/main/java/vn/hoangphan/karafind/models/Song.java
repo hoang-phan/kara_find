@@ -12,17 +12,6 @@ public class Song {
 
     private int vol;
 
-    public Song(String name, String lyric, String author, String id, int vol, boolean favorited) {
-        this.name = name;
-        this.lyric = lyric;
-        this.author = author;
-        this.vol = vol;
-        this.id = id;
-        this.favorited = favorited;
-    }
-
-    public Song() { }
-
     public String getName() {
         return name;
     }

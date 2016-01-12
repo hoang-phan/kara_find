@@ -2,6 +2,13 @@ package vn.hoangphan.karafind.net;
 
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
+
 import retrofit.JacksonConverterFactory;
 import retrofit.Retrofit;
 import vn.hoangphan.karafind.utils.Constants;
@@ -14,11 +21,9 @@ public class APIService {
 
     public static KaraAPI getInstance() {
         if (instance == null) {
-            Log.e("instance", "new instance");
             Retrofit restAdapter = new Retrofit.Builder().baseUrl(Constants.API_ENDPOINT).addConverterFactory(JacksonConverterFactory.create()).build();
             instance = restAdapter.create(KaraAPI.class);
         } else {
-            Log.e("instance", "old instance");
         }
         return instance;
     }
