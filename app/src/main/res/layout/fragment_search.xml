@@ -15,6 +15,7 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:src="@android:drawable/ic_menu_search"
+            android:id="@+id/ic_search"
             android:layout_gravity="right"
             android:layout_marginRight="@dimen/icn_search_margin_right"/>
     </FrameLayout>
