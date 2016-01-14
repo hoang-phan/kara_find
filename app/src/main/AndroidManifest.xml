@@ -19,6 +19,7 @@
         </activity>
 
         <service android:name=".services.GetLinkService" />
+        <service android:name=".services.UpdateService" />
     </application>
 
 </manifest>
