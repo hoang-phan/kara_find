@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SONGID"
-        android:textStyle="bold"
-        android:textSize="@dimen/song_id_text_size"
-        android:id="@+id/tv_vol"/>
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="SONGID"
-        android:textStyle="bold"
-        android:textSize="@dimen/song_name_text_size"
-        android:id="@+id/tv_updated_at"/>
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_weight="8"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SONGID"
+            android:textStyle="bold"
+            android:textSize="22sp"
+            android:id="@+id/tv_vol"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="SONGID"
+            android:textSize="15sp"
+            android:id="@+id/tv_updated_at"/>
+    </LinearLayout>
+    <Button
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:id="@+id/btn_update"/>
 </LinearLayout>

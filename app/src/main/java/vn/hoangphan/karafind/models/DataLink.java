@@ -13,7 +13,7 @@ public class DataLink {
     private String link;
 
     @JsonProperty("updated_at")
-    private int updatedAt;
+    private long updatedAt;
 
     public int getVol() {
         return vol;
@@ -31,11 +31,11 @@ public class DataLink {
         this.link = link;
     }
 
-    public int getUpdatedAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(int updatedAt) {
+    public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
     }
 }
