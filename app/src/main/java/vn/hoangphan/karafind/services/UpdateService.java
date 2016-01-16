@@ -10,8 +10,10 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+import au.com.bytecode.opencsv.CSVReader;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.LanguageUtils;
 
 /**
  * Created by Hoang Phan on 1/12/2016.
@@ -30,21 +32,21 @@ public class UpdateService extends IntentService {
             try {
                 URL url = new URL(link);
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-                String str = in.readLine();
+                CSVReader reader = new CSVReader(new InputStreamReader(url.openStream()));
+                List<String> headers = Arrays.asList(reader.readNext());
 
-                List<String> headers = Arrays.asList(str.split(","));
                 int column_id = headers.indexOf("id"),
                         column_name = headers.indexOf("name"),
                         column_author = headers.indexOf("author"),
                         column_lyric = headers.indexOf("lyric");
 
-                while ((str = in.readLine()) != null) {
-                    String[] parts = str.split(",", 4);
-                    if (parts.length == 4) {
-                        DatabaseHelper.getInstance().insertSong(parts[column_id], parts[column_name], parts[column_lyric], parts[column_author], vol, false);
-                    }
+                String[] parts;
+
+                while ((parts = reader.readNext()) != null) {
+                    String lyric = parts[column_lyric];
+                    DatabaseHelper.getInstance().insertSong(parts[column_id], parts[column_name], lyric, parts[column_author], vol, false, LanguageUtils.translateToUtf(lyric));
                 }
+                DatabaseHelper.getInstance().prepareFTSTable();
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -4,11 +4,11 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="10dp">
     <TextView
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="wrap_content"
         android:gravity="center_vertical"
         android:layout_height="match_parent"
         android:text="SONGID"
+        android:padding="10dp"
         android:textStyle="bold"
         android:textSize="@dimen/song_id_text_size"
         android:id="@+id/tv_song_id"/>

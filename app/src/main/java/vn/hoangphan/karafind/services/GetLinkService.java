@@ -11,6 +11,7 @@ import retrofit.Retrofit;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.net.DataLinksResponse;
 import vn.hoangphan.karafind.net.APIService;
+import vn.hoangphan.karafind.utils.Constants;
 
 /**
  * Created by Hoang Phan on 1/12/2016.
@@ -28,6 +29,8 @@ public class GetLinkService extends IntentService {
             public void onResponse(Response<DataLinksResponse> response, Retrofit retrofit) {
                 if (response != null && response.body() != null) {
                     DatabaseHelper.getInstance().insertDataLinks(response.body().getDataLinks());
+                    Intent intent = new Intent(Constants.INTENT_GET_DATA_LINKS_COMPLETED);
+                    sendBroadcast(intent);
                 }
             }
 

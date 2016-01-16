@@ -8,6 +8,8 @@ public class Song {
     private String lyric;
     private String author;
     private String id;
+    private String utf;
+
     private boolean favorited;
 
     private int vol;
@@ -58,5 +60,13 @@ public class Song {
 
     public void setFavorited(boolean favorited) {
         this.favorited = favorited;
+    }
+
+    public String getUtf() {
+        return utf;
+    }
+
+    public void setUtf(String utf) {
+        this.utf = utf;
     }
 }

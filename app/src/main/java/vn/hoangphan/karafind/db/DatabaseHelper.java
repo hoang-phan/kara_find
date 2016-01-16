@@ -12,6 +12,7 @@ import java.util.List;
 
 import vn.hoangphan.karafind.models.DataLink;
 import vn.hoangphan.karafind.models.Song;
+import vn.hoangphan.karafind.utils.Constants;
 
 /**
  * Created by eastagile-tc on 1/12/16.
@@ -20,6 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "kara.db";
     public static final String TABLE_SONGS = "songs";
     public static final String TABLE_DATA_LINKS = "data_links";
+    public static final String TABLE_FTS_SEARCH = "fts_search";
     public static final String COLUMN_FAVORITED = "favorited";
     public static final String COLUMN_UPDATED_AT = "updated_at";
     public static final String COLUMN_ID = "id";
@@ -29,11 +31,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_VOL = "vol";
     public static final String COLUMN_LINK = "link";
+    public static final String COLUMN_UTF = "utf";
 
     public static final int VALUE_TRUE = 1;
     public static final int VALUE_FALSE = 0;
 
-    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer)";
+    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer, %s text)";
+    public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
     public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer)";
 
     public static final String ADD_INDEX_SQL = "CREATE INDEX `index_%s` ON `%s` (`%s` ASC)";
@@ -56,8 +60,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF));
         db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_SEARCH, COLUMN_UTF));
         db.execSQL(String.format(ADD_INDEX_SQL, COLUMN_SONG_ID, TABLE_SONGS, COLUMN_SONG_ID));
         db.execSQL(String.format(ADD_INDEX_SQL, COLUMN_VOL, TABLE_DATA_LINKS, COLUMN_VOL));
     }
@@ -76,7 +81,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         resetDb(getWritableDatabase());
     }
 
-    public boolean insertSong(String id, String name, String lyric, String author, int volumn, boolean favorited) {
+    public boolean insertSong(String id, String name, String lyric, String author, int volumn, boolean favorited, String utf) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_SONG_ID, id);
@@ -84,13 +89,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_LYRIC, lyric);
         values.put(COLUMN_AUTHOR, author);
         values.put(COLUMN_VOL, volumn);
+        values.put(COLUMN_UTF, utf);
         values.put(COLUMN_FAVORITED, favorited ? VALUE_TRUE : VALUE_FALSE);
-        db.insert(TABLE_SONGS, null, values);
-        return true;
-    }
-
-    public boolean insertDataLink(DataLink dataLink) {
-        getWritableDatabase().insert(TABLE_DATA_LINKS, null, valuesFor(dataLink));
+        db.insertWithOnConflict(TABLE_SONGS, null, values,SQLiteDatabase.CONFLICT_REPLACE);
         return true;
     }
 
@@ -111,23 +112,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public int update(String id, boolean favorited) {
+    public boolean prepareFTSTable() {
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_FAVORITED, favorited ? VALUE_TRUE : VALUE_FALSE);
-        return db.update(TABLE_SONGS, values, String.format("%s = ?", COLUMN_SONG_ID), new String[] { id });
+        db.delete(TABLE_FTS_SEARCH, null, null);
+        getWritableDatabase().execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", TABLE_FTS_SEARCH, COLUMN_UTF, COLUMN_ID, TABLE_SONGS));
+        return true;
     }
 
-    public int delete(Song song) {
-        SQLiteDatabase db = getWritableDatabase();
-        return db.delete(TABLE_SONGS, "song_id = ?", new String[]{song.getId()});
-    }
-
-    public List<Song> allSongs() {
+    public List<Song> songsMatch(String filter) {
         ArrayList<Song> songs = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery(String.format("SELECT * FROM %s", TABLE_SONGS), null);
+        Cursor res = db.rawQuery(String.format("SELECT %1$s.*, HEX(MATCHINFO(%2$s, 's')) AS rel FROM %1$s JOIN %2$s ON %1$s.%3$s = %2$s.docid WHERE %2$s MATCH ? ORDER BY rel DESC", TABLE_SONGS, TABLE_FTS_SEARCH, COLUMN_ID), new String[] {filter });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
@@ -156,6 +152,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private void dropDb(SQLiteDatabase db) {
         db.execSQL(String.format(DROP_INDEX_SQL, COLUMN_SONG_ID));
         db.execSQL(String.format(DROP_INDEX_SQL, COLUMN_VOL));
+        db.execSQL(String.format(DROP_TABLE_SQL, TABLE_FTS_SEARCH));
         db.execSQL(String.format(DROP_TABLE_SQL, TABLE_SONGS));
         db.execSQL(String.format(DROP_TABLE_SQL, TABLE_DATA_LINKS));
     }
@@ -177,12 +174,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dataLink.setLink(res.getString(res.getColumnIndex(COLUMN_LINK)));
         dataLink.setUpdatedAt(res.getInt(res.getColumnIndex(COLUMN_UPDATED_AT)));
         return dataLink;
-    }
-
-    private ContentValues valuesFor(DataLink dataLink) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_VOL, dataLink.getVol());
-        values.put(COLUMN_LINK, dataLink.getLink());
-        return values;
     }
 }
