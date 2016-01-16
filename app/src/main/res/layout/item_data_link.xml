@@ -21,11 +21,23 @@
             android:textSize="15sp"
             android:id="@+id/tv_updated_at"/>
     </LinearLayout>
-    <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="10dp"
-        android:src="@drawable/ic_download"
-        android:id="@+id/btn_update" />
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="10dp"
+            android:src="@drawable/ic_download"
+            android:id="@+id/iv_update" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/updating"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/tv_updating"
+            android:visibility="invisible"
+            />
+    </FrameLayout>
 </LinearLayout>

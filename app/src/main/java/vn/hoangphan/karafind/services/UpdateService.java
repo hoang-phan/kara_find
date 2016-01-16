@@ -2,16 +2,23 @@ package vn.hoangphan.karafind.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import au.com.bytecode.opencsv.CSVReader;
 import vn.hoangphan.karafind.db.DatabaseHelper;
+import vn.hoangphan.karafind.models.DataLink;
+import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 
@@ -19,37 +26,62 @@ import vn.hoangphan.karafind.utils.LanguageUtils;
  * Created by Hoang Phan on 1/12/2016.
  */
 public class UpdateService extends IntentService {
+    private static Queue<DataLink> mLinks = new ConcurrentLinkedQueue<>();
+    private static boolean mIsRunning = false;
+
     public UpdateService() {
         super("UpdateService");
     }
 
+    public static void pushLink(DataLink dataLink) {
+        mLinks.add(dataLink);
+    }
+
     @Override
     protected void onHandleIntent(Intent intent) {
-        String link = intent.getStringExtra(Constants.LINK);
-        int vol = intent.getIntExtra(Constants.VOL, -1);
+        if (mIsRunning) {
+            return;
+        }
+        mIsRunning = true;
+        DataLink dataLink;
+        while (mLinks.size() > 0) {
+            dataLink = mLinks.remove();
 
-        if (vol >= 0) {
-            try {
-                URL url = new URL(link);
+            String link = dataLink.getLink();
+            int vol = dataLink.getVol();
 
-                CSVReader reader = new CSVReader(new InputStreamReader(url.openStream()));
-                List<String> headers = Arrays.asList(reader.readNext());
+            if (vol >= 0) {
+                try {
+                    URL url = new URL(link);
 
-                int column_id = headers.indexOf("id"),
-                        column_name = headers.indexOf("name"),
-                        column_author = headers.indexOf("author"),
-                        column_lyric = headers.indexOf("lyric");
+                    CSVReader reader = new CSVReader(new InputStreamReader(url.openStream()));
+                    List<String> headers = Arrays.asList(reader.readNext());
 
-                String[] parts;
+                    int column_id = headers.indexOf("id"),
+                            column_name = headers.indexOf("name"),
+                            column_author = headers.indexOf("author"),
+                            column_lyric = headers.indexOf("lyric");
 
-                while ((parts = reader.readNext()) != null) {
-                    String lyric = parts[column_lyric];
-                    DatabaseHelper.getInstance().insertSong(parts[column_id], parts[column_name], lyric, parts[column_author], vol, false, LanguageUtils.translateToUtf(lyric));
+                    String[] parts;
+                    List<Song> songs = new ArrayList<>();
+
+                    while ((parts = reader.readNext()) != null) {
+                        Song song = new Song();
+                        song.setId(parts[column_id]);
+                        song.setName(parts[column_name]);
+                        song.setAuthor(parts[column_author]);
+                        song.setLyric(parts[column_lyric]);
+                        song.setVol(vol);
+                        songs.add(song);
+                    }
+                    DatabaseHelper.getInstance().insertSongs(songs);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
-                DatabaseHelper.getInstance().prepareFTSTable();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+            DatabaseHelper.getInstance().prepareFTSTable();
+
+            mIsRunning = false;
         }
     }
 }

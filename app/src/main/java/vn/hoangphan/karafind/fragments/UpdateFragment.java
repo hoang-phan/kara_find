@@ -1,6 +1,5 @@
 package vn.hoangphan.karafind.fragments;
 
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,10 +48,8 @@ public class UpdateFragment extends Fragment {
         mAdapter.setOnDataLinkSelected(new OnDataLinkSelected() {
             @Override
             public void update(DataLink dataLink) {
-                Intent intent = new Intent(getActivity(), UpdateService.class);
-                intent.putExtra(Constants.VOL, dataLink.getVol());
-                intent.putExtra(Constants.LINK, dataLink.getLink());
-                getActivity().startService(intent);
+                UpdateService.pushLink(dataLink);
+                getActivity().startService(new Intent(getActivity(), UpdateService.class));
             }
         });
         mAdapter.notifyDataSetChanged();

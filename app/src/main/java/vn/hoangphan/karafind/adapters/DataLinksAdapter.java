@@ -9,7 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import vn.hoangphan.karafind.R;
 import vn.hoangphan.karafind.models.DataLink;
@@ -21,6 +23,7 @@ import vn.hoangphan.karafind.utils.OnDataLinkSelected;
  */
 public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     private List<DataLink> mDataLinks = new ArrayList<>();
+    private Set<Integer> updatingPositions = new HashSet<>();
     private static OnDataLinkSelected mOnDataLinkSelected = null;
 
     @Override
@@ -30,8 +33,28 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     }
 
     @Override
-    public void onBindViewHolder(DataLinkHolder holder, int position) {
-        holder.populateData(mDataLinks.get(position));
+    public void onBindViewHolder(final DataLinkHolder holder, final int position) {
+        final DataLink dataLink = mDataLinks.get(position);
+        holder.mTvVol.setText("VOL " + dataLink.getVol());
+        holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
+        if (updatingPositions.contains(position)) {
+            holder.mIvUpdate.setVisibility(View.INVISIBLE);
+            holder.mTvUpdating.setVisibility(View.VISIBLE);
+        } else {
+            holder.mIvUpdate.setVisibility(View.VISIBLE);
+            holder.mTvUpdating.setVisibility(View.INVISIBLE);
+        }
+        holder.mIvUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnDataLinkSelected != null) {
+                    mOnDataLinkSelected.update(dataLink);
+                }
+                updatingPositions.add(position);
+                holder.mIvUpdate.setVisibility(View.INVISIBLE);
+                holder.mTvUpdating.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     @Override
@@ -48,28 +71,15 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     }
 
     public static class DataLinkHolder extends ViewHolder {
-        TextView mTvVol, mTvUpdatedAt;
-        ImageView mBtnUpdate;
+        TextView mTvVol, mTvUpdatedAt, mTvUpdating;
+        ImageView mIvUpdate;
 
         public DataLinkHolder(View view) {
             super(view);
             mTvVol = (TextView) view.findViewById(R.id.tv_vol);
             mTvUpdatedAt = (TextView) view.findViewById(R.id.tv_updated_at);
-            mBtnUpdate = (ImageView) view.findViewById(R.id.btn_update);
-        }
-
-        public void populateData(final DataLink dataLink) {
-            mTvVol.setText(String.valueOf(dataLink.getVol()));
-            mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
-            mBtnUpdate.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mOnDataLinkSelected != null) {
-                        mOnDataLinkSelected.update(dataLink);
-                    }
-                    mBtnUpdate.setVisibility(View.INVISIBLE);
-                }
-            });
+            mTvUpdating = (TextView) view.findViewById(R.id.tv_updating);
+            mIvUpdate = (ImageView) view.findViewById(R.id.iv_update);
         }
     }
 }

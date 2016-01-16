@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 import vn.hoangphan.karafind.models.DataLink;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.LanguageUtils;
 
 /**
  * Created by eastagile-tc on 1/12/16.
@@ -81,22 +83,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         resetDb(getWritableDatabase());
     }
 
-    public boolean insertSong(String id, String name, String lyric, String author, int volumn, boolean favorited, String utf) {
+    public boolean insertSongs(List<Song> songs) {
+        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s, %9$s) VALUES ((SELECT %2$s FROM %1$s WHERE %3$s = ?), ?, ?, ?, ?, ?, ?, ?);", TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_UTF, COLUMN_FAVORITED);
         SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_SONG_ID, id);
-        values.put(COLUMN_NAME, name);
-        values.put(COLUMN_LYRIC, lyric);
-        values.put(COLUMN_AUTHOR, author);
-        values.put(COLUMN_VOL, volumn);
-        values.put(COLUMN_UTF, utf);
-        values.put(COLUMN_FAVORITED, favorited ? VALUE_TRUE : VALUE_FALSE);
-        db.insertWithOnConflict(TABLE_SONGS, null, values,SQLiteDatabase.CONFLICT_REPLACE);
+        SQLiteStatement statement = db.compileStatement(insertSql);
+        db.beginTransaction();
+        for (Song song : songs) {
+            statement.clearBindings();
+            statement.bindString(1, song.getId());
+            statement.bindString(2, song.getId());
+            statement.bindString(3, song.getName());
+            statement.bindString(4, song.getLyric());
+            statement.bindString(5, song.getAuthor());
+            statement.bindLong(6, song.getVol());
+            statement.bindString(7, LanguageUtils.translateToUtf(song.getLyric()));
+            statement.bindLong(8, VALUE_FALSE);
+            statement.execute();
+        }
+        db.setTransactionSuccessful();
+        db.endTransaction();
         return true;
     }
 
     public boolean insertDataLinks(List<DataLink> dataLinks) {
-        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s) VALUES ((SELECT %2$s FROM %1$s WHERE %3$s = ?), ?, ?);", TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK);
+        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s) VALUES ((SELECT %2$s FROM %1$s WHERE %3$s = ?), ?, ?, ?);", TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT);
         SQLiteDatabase db = getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(insertSql);
         db.beginTransaction();
@@ -105,6 +115,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             statement.bindLong(1, dataLink.getVol());
             statement.bindLong(2, dataLink.getVol());
             statement.bindString(3, dataLink.getLink());
+            statement.bindLong(4, dataLink.getUpdatedAt());
             statement.execute();
         }
         db.setTransactionSuccessful();
