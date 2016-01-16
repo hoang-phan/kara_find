@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_weight="8"
+        android:layout_weight="1"
         android:layout_height="match_parent"
         android:orientation="vertical">
         <TextView
@@ -22,9 +22,9 @@
             android:id="@+id/tv_updated_at"/>
     </LinearLayout>
     <Button
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_margin="10dp"
+        android:text="@string/update"
         android:id="@+id/btn_update"/>
 </LinearLayout>

@@ -57,7 +57,7 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
             mTvId.setText(song.getId());
             mTvName.setText(song.getName());
             mTvAuthor.setText(song.getAuthor());
-            mTvLyric.setText(song.getLyric());
+            mTvLyric.setText(song.getLyric().substring(0, Math.min(40, song.getLyric().length())) + "...");
             mIvFavorited.setImageResource(song.isFavorited() ? android.R.drawable.star_big_on : android.R.drawable.star_big_off);
         }
     }

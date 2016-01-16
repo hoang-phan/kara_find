@@ -30,11 +30,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_VOL = "vol";
     public static final String COLUMN_LINK = "link";
+    public static final String COLUMN_UTF = "utf";
 
     public static final int VALUE_TRUE = 1;
     public static final int VALUE_FALSE = 0;
 
-    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer)";
+    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer, %s text)";
     public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (content='%s', %s)";
     public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer)";
 
@@ -58,9 +59,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF));
         db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT));
-        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_SEARCH, TABLE_SONGS, COLUMN_LYRIC));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_SEARCH, TABLE_SONGS, COLUMN_UTF));
         db.execSQL(String.format(ADD_INDEX_SQL, COLUMN_SONG_ID, TABLE_SONGS, COLUMN_SONG_ID));
         db.execSQL(String.format(ADD_INDEX_SQL, COLUMN_VOL, TABLE_DATA_LINKS, COLUMN_VOL));
     }
@@ -79,7 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         resetDb(getWritableDatabase());
     }
 
-    public boolean insertSong(String id, String name, String lyric, String author, int volumn, boolean favorited) {
+    public boolean insertSong(String id, String name, String lyric, String author, int volumn, boolean favorited, String utf) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_SONG_ID, id);
@@ -87,6 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_LYRIC, lyric);
         values.put(COLUMN_AUTHOR, author);
         values.put(COLUMN_VOL, volumn);
+        values.put(COLUMN_UTF, utf);
         values.put(COLUMN_FAVORITED, favorited ? VALUE_TRUE : VALUE_FALSE);
         db.insertWithOnConflict(TABLE_SONGS, null, values,SQLiteDatabase.CONFLICT_REPLACE);
         return true;
@@ -109,23 +111,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public int update(String id, boolean favorited) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_FAVORITED, favorited ? VALUE_TRUE : VALUE_FALSE);
-        return db.update(TABLE_SONGS, values, String.format("%s = ?", COLUMN_SONG_ID), new String[] { id });
-    }
-
-    public int delete(Song song) {
-        SQLiteDatabase db = getWritableDatabase();
-        return db.delete(TABLE_SONGS, "song_id = ?", new String[]{song.getId()});
+    public boolean prepareFTSTable() {
+        getWritableDatabase().execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", TABLE_FTS_SEARCH, COLUMN_UTF, COLUMN_ID, TABLE_SONGS));
+        return true;
     }
 
     public List<Song> songsMatch(String filter) {
         ArrayList<Song> songs = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery(String.format("SELECT * FROM %1$s WHERE %1$s MATCH ?", TABLE_FTS_SEARCH), new String[] { filter });
+        Cursor res = db.rawQuery(String.format("SELECT * FROM %2$s WHERE %3$s IN (SELECT docid FROM %1$s WHERE %1$s MATCH ?)", TABLE_FTS_SEARCH, TABLE_SONGS, COLUMN_ID), new String[] { filter });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
@@ -176,12 +171,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dataLink.setLink(res.getString(res.getColumnIndex(COLUMN_LINK)));
         dataLink.setUpdatedAt(res.getInt(res.getColumnIndex(COLUMN_UPDATED_AT)));
         return dataLink;
-    }
-
-    private ContentValues valuesFor(DataLink dataLink) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_VOL, dataLink.getVol());
-        values.put(COLUMN_LINK, dataLink.getLink());
-        return values;
     }
 }
