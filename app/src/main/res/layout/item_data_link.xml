@@ -21,10 +21,11 @@
             android:textSize="15sp"
             android:id="@+id/tv_updated_at"/>
     </LinearLayout>
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_gravity="center_vertical"
         android:layout_margin="10dp"
-        android:text="@string/update"
-        android:id="@+id/btn_update"/>
+        android:src="@drawable/ic_download"
+        android:id="@+id/btn_update" />
 </LinearLayout>

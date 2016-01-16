@@ -1,13 +1,11 @@
 package vn.hoangphan.karafind.adapters;
 
-import android.content.Intent;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -51,13 +49,13 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
 
     public static class DataLinkHolder extends ViewHolder {
         TextView mTvVol, mTvUpdatedAt;
-        Button mBtnUpdate;
+        ImageView mBtnUpdate;
 
         public DataLinkHolder(View view) {
             super(view);
             mTvVol = (TextView) view.findViewById(R.id.tv_vol);
             mTvUpdatedAt = (TextView) view.findViewById(R.id.tv_updated_at);
-            mBtnUpdate = (Button) view.findViewById(R.id.btn_update);
+            mBtnUpdate = (ImageView) view.findViewById(R.id.btn_update);
         }
 
         public void populateData(final DataLink dataLink) {
@@ -69,6 +67,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
                     if (mOnDataLinkSelected != null) {
                         mOnDataLinkSelected.update(dataLink);
                     }
+                    mBtnUpdate.setVisibility(View.INVISIBLE);
                 }
             });
         }

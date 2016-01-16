@@ -34,7 +34,6 @@ public class KaraokeActivity extends ActionBarActivity {
     }
 
     private void bindComponents() {
-        DatabaseHelper.getInstance().resetDb();
         mPager.setAdapter(mAdapter);
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.search));
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.update));

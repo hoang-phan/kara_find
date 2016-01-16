@@ -12,6 +12,7 @@ import java.util.List;
 
 import vn.hoangphan.karafind.models.DataLink;
 import vn.hoangphan.karafind.models.Song;
+import vn.hoangphan.karafind.utils.Constants;
 
 /**
  * Created by eastagile-tc on 1/12/16.
@@ -36,7 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int VALUE_FALSE = 0;
 
     public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer, %s text)";
-    public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (content='%s', %s)";
+    public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
     public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer)";
 
     public static final String ADD_INDEX_SQL = "CREATE INDEX `index_%s` ON `%s` (`%s` ASC)";
@@ -61,7 +62,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF));
         db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT));
-        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_SEARCH, TABLE_SONGS, COLUMN_UTF));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_SEARCH, COLUMN_UTF));
         db.execSQL(String.format(ADD_INDEX_SQL, COLUMN_SONG_ID, TABLE_SONGS, COLUMN_SONG_ID));
         db.execSQL(String.format(ADD_INDEX_SQL, COLUMN_VOL, TABLE_DATA_LINKS, COLUMN_VOL));
     }
@@ -112,6 +113,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean prepareFTSTable() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_FTS_SEARCH, null, null);
         getWritableDatabase().execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", TABLE_FTS_SEARCH, COLUMN_UTF, COLUMN_ID, TABLE_SONGS));
         return true;
     }
@@ -120,7 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Song> songs = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery(String.format("SELECT * FROM %2$s WHERE %3$s IN (SELECT docid FROM %1$s WHERE %1$s MATCH ?)", TABLE_FTS_SEARCH, TABLE_SONGS, COLUMN_ID), new String[] { filter });
+        Cursor res = db.rawQuery(String.format("SELECT %1$s.*, HEX(MATCHINFO(%2$s, 's')) AS rel FROM %1$s JOIN %2$s ON %1$s.%3$s = %2$s.docid WHERE %2$s MATCH ? ORDER BY rel DESC", TABLE_SONGS, TABLE_FTS_SEARCH, COLUMN_ID), new String[] {filter });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
