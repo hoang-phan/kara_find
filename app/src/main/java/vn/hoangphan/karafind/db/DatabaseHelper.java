@@ -37,6 +37,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final int VALUE_TRUE = 1;
     public static final int VALUE_FALSE = 0;
+    public static final int ROW_LIMIT = 10;
 
     public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer, %s text)";
     public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
@@ -134,7 +135,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Song> songs = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor res = db.rawQuery(String.format("SELECT %1$s.*, HEX(MATCHINFO(%2$s, 's')) AS rel FROM %1$s JOIN %2$s ON %1$s.%3$s = %2$s.docid WHERE %2$s MATCH ? ORDER BY rel DESC", TABLE_SONGS, TABLE_FTS_SEARCH, COLUMN_ID), new String[] {filter });
+        Cursor res = db.rawQuery(String.format("SELECT %1$s.* FROM %1$s JOIN (SELECT docid, matchinfo(%2$s, 's') AS rank FROM %2$s WHERE %2$s match ? ORDER BY rank DESC LIMIT %4$d) fts ON %1$s.%3$s = fts.docid ORDER BY fts.rank DESC", TABLE_SONGS, TABLE_FTS_SEARCH, COLUMN_ID, ROW_LIMIT), new String[] {filter });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
