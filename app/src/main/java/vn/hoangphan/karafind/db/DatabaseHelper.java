@@ -127,6 +127,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public boolean updateFavorite(Song song) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ?", TABLE_SONGS, COLUMN_FAVORITED, COLUMN_SONG_ID), new String[] { song.isFavorited() ? "1" : "0", song.getId() });
+        return true;
+    }
+
     public boolean prepareFTSTable() {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_FTS_SEARCH, null, null);

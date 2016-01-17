@@ -38,17 +38,17 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         holder.mTvVol.setText("VOL " + dataLink.getVol());
         holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
         if (dataLink.getVersion() != 0 && dataLink.getUpdatedAt() == dataLink.getVersion()) {
-            holder.mIvUpdate.setVisibility(View.INVISIBLE);
-            holder.mTvUpdating.setVisibility(View.INVISIBLE);
+            holder.mIvUpdate.setVisibility(View.GONE);
+            holder.mTvUpdating.setVisibility(View.GONE);
             holder.mTvUpdated.setVisibility(View.VISIBLE);
         } else if (updatingPositions.contains(position)) {
-            holder.mIvUpdate.setVisibility(View.INVISIBLE);
+            holder.mIvUpdate.setVisibility(View.GONE);
             holder.mTvUpdating.setVisibility(View.VISIBLE);
-            holder.mTvUpdated.setVisibility(View.INVISIBLE);
+            holder.mTvUpdated.setVisibility(View.GONE);
         } else {
             holder.mIvUpdate.setVisibility(View.VISIBLE);
-            holder.mTvUpdating.setVisibility(View.INVISIBLE);
-            holder.mTvUpdated.setVisibility(View.INVISIBLE);
+            holder.mTvUpdating.setVisibility(View.GONE);
+            holder.mTvUpdated.setVisibility(View.GONE);
         }
         holder.mIvUpdate.setOnClickListener(new View.OnClickListener() {
             @Override

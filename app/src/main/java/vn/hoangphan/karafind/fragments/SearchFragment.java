@@ -1,6 +1,7 @@
 package vn.hoangphan.karafind.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -15,8 +16,11 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +28,9 @@ import java.util.List;
 import vn.hoangphan.karafind.R;
 import vn.hoangphan.karafind.adapters.SongsAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
+import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.LanguageUtils;
+import vn.hoangphan.karafind.utils.OnSongDetailClick;
 
 /**
  * Created by Hoang Phan on 1/12/2016.
@@ -37,6 +43,7 @@ public class SearchFragment extends Fragment {
     private RecyclerView mRvSongs;
     private ImageView mIcSearch;
     private SongsAdapter mAdapter;
+    private PopupWindow mPopupSong;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,6 +80,32 @@ public class SearchFragment extends Fragment {
                 filterSongs();
             }
         });
+
+        mAdapter.setOnSongDetailClick(new OnSongDetailClick() {
+            @Override
+            public void view(Song song) {
+                LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                View popupView = inflater.inflate(R.layout.popup_song_detail, null);
+                TextView tvSongId = (TextView)popupView.findViewById(R.id.tv_song_id_detail);
+                TextView tvSongName = (TextView)popupView.findViewById(R.id.tv_song_name_detail);
+                TextView tvSongAuthor = (TextView)popupView.findViewById(R.id.tv_song_author_detail);
+                TextView tvSongLyric = (TextView)popupView.findViewById(R.id.tv_song_lyric_detail);
+                Button btnDismiss = (Button)popupView.findViewById(R.id.btn_dismiss);
+                tvSongId.setText(song.getId());
+                tvSongName.setText(song.getName());
+                tvSongAuthor.setText(song.getAuthor());
+                tvSongLyric.setText(song.getLyric());
+                mPopupSong = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                btnDismiss.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mPopupSong.dismiss();
+                    }
+                });
+                mPopupSong.showAsDropDown(mEtSearch, 0, 0);
+            }
+        });
+
         PackageManager packageManager = getActivity().getPackageManager();
         List<ResolveInfo> infos = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         mIcSearch.setEnabled(infos.size() > 0);
@@ -103,5 +136,13 @@ public class SearchFragment extends Fragment {
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onDestroy() {
+        if (mPopupSong != null && mPopupSong.isShowing()) {
+            mPopupSong.dismiss();
+        }
+        super.onDestroy();
     }
 }

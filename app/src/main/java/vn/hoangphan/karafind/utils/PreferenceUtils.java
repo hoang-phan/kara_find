@@ -33,8 +33,16 @@ public class PreferenceUtils {
         mEdit.putLong(key, value).commit();
     }
 
-    public long getConfig(String key) {
+    public void saveConfig(String key, String value) {
+        mEdit.putString(key, value).commit();
+    }
+
+    public long getConfigLong(String key) {
         return mPreferences.getLong(key, 0);
+    }
+
+    public String getConfigString(String key) {
+        return mPreferences.getString(key, "");
     }
 
     public void clear() {
