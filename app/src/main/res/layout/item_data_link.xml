@@ -39,5 +39,13 @@
             android:id="@+id/tv_updating"
             android:visibility="invisible"
             />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/updated"
+            android:layout_gravity="center_vertical"
+            android:id="@+id/tv_updated"
+            android:visibility="invisible"
+            />
     </FrameLayout>
 </LinearLayout>

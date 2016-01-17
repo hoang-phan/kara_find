@@ -5,7 +5,6 @@ package vn.hoangphan.karafind.utils;
  */
 public interface Constants {
     String API_ENDPOINT = "http://api-karaoke-db.herokuapp.com";
-    String LINK = "link";
-    String VOL = "vol";
     String INTENT_GET_DATA_LINKS_COMPLETED = "android.intent.action.GET_DATA_LINKS_COMPLETED";
+    String LAST_FETCHED_AT = "last_fetched_at";
 }

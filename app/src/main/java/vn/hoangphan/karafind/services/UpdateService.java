@@ -9,10 +9,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -20,7 +18,6 @@ import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.DataLink;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
-import vn.hoangphan.karafind.utils.LanguageUtils;
 
 /**
  * Created by Hoang Phan on 1/12/2016.
@@ -52,6 +49,7 @@ public class UpdateService extends IntentService {
 
             if (vol >= 0) {
                 try {
+                    long time = System.currentTimeMillis();
                     URL url = new URL(link);
 
                     CSVReader reader = new CSVReader(new InputStreamReader(url.openStream()));
@@ -74,7 +72,14 @@ public class UpdateService extends IntentService {
                         song.setVol(vol);
                         songs.add(song);
                     }
+                    long time2 = System.currentTimeMillis();
                     DatabaseHelper.getInstance().insertSongs(songs);
+                    DatabaseHelper.getInstance().updateLinkVersion(dataLink);
+
+                    Log.d("CSV read time:", (time2 - time) + " milliseconds");
+                    Log.d("Database time:", (System.currentTimeMillis() - time2) + " milliseconds");
+
+                    sendBroadcast(new Intent(Constants.INTENT_GET_DATA_LINKS_COMPLETED));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

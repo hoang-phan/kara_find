@@ -11,7 +11,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/et_search"
             android:singleLine="true"
-            android:hint="Id, name, author or lyric ..."
+            android:hint="@string/name_author_or_lyric"
             android:padding="@dimen/activity_horizontal_margin"/>
 
         <ImageView

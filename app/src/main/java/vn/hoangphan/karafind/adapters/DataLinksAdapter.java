@@ -37,12 +37,18 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         final DataLink dataLink = mDataLinks.get(position);
         holder.mTvVol.setText("VOL " + dataLink.getVol());
         holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
-        if (updatingPositions.contains(position)) {
+        if (dataLink.getVersion() != 0 && dataLink.getUpdatedAt() == dataLink.getVersion()) {
+            holder.mIvUpdate.setVisibility(View.INVISIBLE);
+            holder.mTvUpdating.setVisibility(View.INVISIBLE);
+            holder.mTvUpdated.setVisibility(View.VISIBLE);
+        } else if (updatingPositions.contains(position)) {
             holder.mIvUpdate.setVisibility(View.INVISIBLE);
             holder.mTvUpdating.setVisibility(View.VISIBLE);
+            holder.mTvUpdated.setVisibility(View.INVISIBLE);
         } else {
             holder.mIvUpdate.setVisibility(View.VISIBLE);
             holder.mTvUpdating.setVisibility(View.INVISIBLE);
+            holder.mTvUpdated.setVisibility(View.INVISIBLE);
         }
         holder.mIvUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,8 +57,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
                     mOnDataLinkSelected.update(dataLink);
                 }
                 updatingPositions.add(position);
-                holder.mIvUpdate.setVisibility(View.INVISIBLE);
-                holder.mTvUpdating.setVisibility(View.VISIBLE);
+                notifyDataSetChanged();
             }
         });
     }
@@ -71,7 +76,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     }
 
     public static class DataLinkHolder extends ViewHolder {
-        TextView mTvVol, mTvUpdatedAt, mTvUpdating;
+        TextView mTvVol, mTvUpdatedAt, mTvUpdating, mTvUpdated;
         ImageView mIvUpdate;
 
         public DataLinkHolder(View view) {
@@ -79,6 +84,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
             mTvVol = (TextView) view.findViewById(R.id.tv_vol);
             mTvUpdatedAt = (TextView) view.findViewById(R.id.tv_updated_at);
             mTvUpdating = (TextView) view.findViewById(R.id.tv_updating);
+            mTvUpdated = (TextView) view.findViewById(R.id.tv_updated);
             mIvUpdate = (ImageView) view.findViewById(R.id.iv_update);
         }
     }

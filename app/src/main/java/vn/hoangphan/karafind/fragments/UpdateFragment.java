@@ -53,15 +53,6 @@ public class UpdateFragment extends Fragment {
             }
         });
         mAdapter.notifyDataSetChanged();
-        mBtnUpdateAll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                for (DataLink dataLink : DatabaseHelper.getInstance().allDataLinks()) {
-                    Intent intent = new Intent(getActivity(), UpdateService.class);
-                    getActivity().startService(intent);
-                }
-            }
-        });
     }
 
     @Override
