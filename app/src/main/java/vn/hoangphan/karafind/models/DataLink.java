@@ -15,6 +15,8 @@ public class DataLink {
     @JsonProperty("updated_at")
     private long updatedAt;
 
+    private long version;
+
     public int getVol() {
         return vol;
     }
@@ -37,5 +39,13 @@ public class DataLink {
 
     public void setUpdatedAt(long updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public void setVersion(long version) {
+        this.version = version;
     }
 }

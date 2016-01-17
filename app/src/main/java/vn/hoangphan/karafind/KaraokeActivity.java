@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.text.format.DateUtils;
 
 import vn.hoangphan.karafind.adapters.PagerAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.services.GetLinkService;
+import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.PreferenceUtils;
 import vn.hoangphan.karafind.views.CustomTabLayout;
 
 public class KaraokeActivity extends ActionBarActivity {
@@ -26,7 +29,8 @@ public class KaraokeActivity extends ActionBarActivity {
     }
 
     private void initComponents() {
-        DatabaseHelper.newInstance(this);
+        DatabaseHelper.init(this);
+        PreferenceUtils.init(this);
         mAdapter = new PagerAdapter(getSupportFragmentManager());
 
         mTabLayout = (CustomTabLayout)findViewById(R.id.tab_layout);
@@ -55,7 +59,9 @@ public class KaraokeActivity extends ActionBarActivity {
         });
         mPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
 
-        Intent intent = new Intent(this, GetLinkService.class);
-        startService(intent);
+        if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfig(Constants.LAST_FETCHED_AT))) {
+            Intent intent = new Intent(this, GetLinkService.class);
+            startService(intent);
+        }
     }
 }
