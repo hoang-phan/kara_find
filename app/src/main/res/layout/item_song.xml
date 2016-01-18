@@ -1,49 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp">
-    <TextView
-        android:layout_width="wrap_content"
-        android:gravity="center_vertical"
-        android:layout_height="match_parent"
-        android:text="SONGID"
-        android:padding="10dp"
-        android:textStyle="bold"
-        android:textSize="@dimen/song_id_text_size"
-        android:id="@+id/tv_song_id"/>
+    android:layout_marginLeft="10dp"
+    android:layout_marginRight="10dp"
+    app:cardCornerRadius="5dp"
+    app:cardBackgroundColor="#ffffff">
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_weight="5"
-        android:orientation="vertical"
-        android:layout_height="match_parent">
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:text="Song's name goes here"
-            android:textSize="@dimen/song_name_text_size"
-            android:id="@+id/tv_song_name"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/song_lyric_text_size"
-            android:text="Short lyric goes here"
-            android:id="@+id/tv_song_lyric"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/song_author_text_size"
-            android:textStyle="italic"
-            android:text="Author"
-            android:layout_marginTop="2dp"
-            android:id="@+id/tv_song_author"/>
-    </LinearLayout>
-    <ImageView
-        android:layout_width="0dp"
-        android:layout_weight="1"
+        android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="end|center_vertical"
-        android:src="@android:drawable/star_big_off"
-        android:id="@+id/iv_song_favorite"/>
-</LinearLayout>
+        android:padding="5dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <TextView
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:layout_weight="9"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:text="Song's name goes here"
+                android:textSize="@dimen/song_name_text_size"
+                android:id="@+id/tv_song_name"
+                android:gravity="center_vertical" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center"
+                android:text="SONGID"
+                android:textStyle="bold"
+                android:textSize="@dimen/song_id_text_size"
+                android:id="@+id/tv_song_id"
+                android:layout_gravity="bottom" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="9"
+                android:orientation="vertical"
+                android:id="@+id/ly_song_detail"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/song_lyric_text_size"
+                    android:text="Short lyric goes here"
+                    android:id="@+id/tv_song_lyric"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/song_author_text_size"
+                    android:textStyle="italic"
+                    android:text="Author"
+                    android:layout_marginTop="2dp"
+                    android:id="@+id/tv_song_author"/>
+            </LinearLayout>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_star"
+                android:id="@+id/iv_song_favorite"/>
+        </LinearLayout>
+    </LinearLayout>
+</android.support.v7.widget.CardView>
+
+
+
+

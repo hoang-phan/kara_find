@@ -37,7 +37,7 @@
             android:text="@string/updating"
             android:layout_gravity="center_vertical"
             android:id="@+id/tv_updating"
-            android:visibility="invisible"
+            android:visibility="gone"
             />
         <TextView
             android:layout_width="wrap_content"
@@ -45,7 +45,7 @@
             android:text="@string/updated"
             android:layout_gravity="center_vertical"
             android:id="@+id/tv_updated"
-            android:visibility="invisible"
+            android:visibility="gone"
             />
     </FrameLayout>
 </LinearLayout>

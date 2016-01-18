@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Kara Find</string>
     <string name="search">Tìm bài hát</string>
-    <string name="update">Danh sách Vol</string>
+    <string name="update">Cập nhật</string>
     <string name="update_all">Cập nhật tất cả</string>
     <string name="updating">Đang cập nhật ...</string>
     <string name="updated">Đã cập nhật</string>
-    <string name="name_author_or_lyric">Tìm theo tên bài hát, tác giả hoặc lời bài hát ...</string>
+    <string name="name_author_or_lyric">Tên bài hát, tác giả hoặc lời bài hát ...</string>
 </resources>
