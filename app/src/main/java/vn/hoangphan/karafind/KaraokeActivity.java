@@ -1,5 +1,6 @@
 package vn.hoangphan.karafind;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -13,6 +14,8 @@ import android.text.format.DateUtils;
 
 import java.util.Locale;
 
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import vn.hoangphan.karafind.adapters.PagerAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.services.GetLinkService;
@@ -29,6 +32,10 @@ public class KaraokeActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("fonts/windsor.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
         initConfigurations();
     }
 
@@ -36,6 +43,11 @@ public class KaraokeActivity extends ActionBarActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         changeLanguage(newConfig);
+    }
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
     private void changeLanguage(Configuration newConfig) {
