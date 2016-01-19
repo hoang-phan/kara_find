@@ -61,6 +61,8 @@ public class KaraokeActivity extends ActionBarActivity {
     private void initConfigurations() {
         DatabaseHelper.init(this);
         PreferenceUtils.init(this);
+//        PreferenceUtils.getInstance().clear();
+//        DatabaseHelper.getInstance().resetDb();
 
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
@@ -133,8 +135,7 @@ public class KaraokeActivity extends ActionBarActivity {
         mPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
 
         if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT))) {
-            Intent intent = new Intent(this, GetLinkService.class);
-            startService(intent);
+            startService(new Intent(this, GetLinkService.class));
         }
     }
 }
