@@ -84,7 +84,7 @@ public class UpdateService extends IntentService {
                     e.printStackTrace();
                 }
             }
-            DatabaseHelper.getInstance().prepareFTSTable();
+            DatabaseHelper.getInstance().prepareFTSTables();
 
             mIsRunning = false;
         }

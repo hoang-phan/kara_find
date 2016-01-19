@@ -37,7 +37,6 @@ import vn.hoangphan.karafind.utils.OnSongDetailClick;
  */
 public class SearchFragment extends Fragment {
     private static final int REQUEST_CODE = 1234;
-    private static final int RESULT_OK = 0;
 
     private EditText mEtSearch;
     private RecyclerView mRvSongs;
@@ -109,11 +108,14 @@ public class SearchFragment extends Fragment {
         PackageManager packageManager = getActivity().getPackageManager();
         List<ResolveInfo> infos = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         mIcSearch.setEnabled(infos.size() > 0);
+        filterSongs();
     }
 
     private void filterSongs() {
         String filter = LanguageUtils.translateToUtf(mEtSearch.getText().toString());
-        if (!TextUtils.isEmpty(filter)){
+        if (TextUtils.isEmpty(filter)){
+            mAdapter.setSongs(DatabaseHelper.getInstance().allSongs());
+        } else {
             mAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(filter));
         }
         mAdapter.notifyDataSetChanged();
