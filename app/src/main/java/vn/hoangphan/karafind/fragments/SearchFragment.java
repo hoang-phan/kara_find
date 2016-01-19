@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+
+import com.lukedeighton.wheelview.WheelView;
+import com.lukedeighton.wheelview.adapter.WheelAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +47,7 @@ public class SearchFragment extends Fragment {
     private ImageView mIcSearch;
     private SongsAdapter mAdapter;
     private PopupWindow mPopupSong;
+    private WheelView mWheel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -50,6 +55,7 @@ public class SearchFragment extends Fragment {
         mRvSongs = (RecyclerView)view.findViewById(R.id.rv_songs);
         mEtSearch = (EditText) view.findViewById(R.id.et_search);
         mIcSearch = (ImageView)view.findViewById(R.id.ic_search);
+        mWheel = (WheelView)view.findViewById(R.id.wl_menu);
         mAdapter = new SongsAdapter();
         return view;
     }
@@ -83,13 +89,13 @@ public class SearchFragment extends Fragment {
         mAdapter.setOnSongDetailClick(new OnSongDetailClick() {
             @Override
             public void view(Song song) {
-                LayoutInflater inflater = (LayoutInflater)getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 View popupView = inflater.inflate(R.layout.popup_song_detail, null);
-                TextView tvSongId = (TextView)popupView.findViewById(R.id.tv_song_id_detail);
-                TextView tvSongName = (TextView)popupView.findViewById(R.id.tv_song_name_detail);
-                TextView tvSongAuthor = (TextView)popupView.findViewById(R.id.tv_song_author_detail);
-                TextView tvSongLyric = (TextView)popupView.findViewById(R.id.tv_song_lyric_detail);
-                Button btnDismiss = (Button)popupView.findViewById(R.id.btn_dismiss);
+                TextView tvSongId = (TextView) popupView.findViewById(R.id.tv_song_id_detail);
+                TextView tvSongName = (TextView) popupView.findViewById(R.id.tv_song_name_detail);
+                TextView tvSongAuthor = (TextView) popupView.findViewById(R.id.tv_song_author_detail);
+                TextView tvSongLyric = (TextView) popupView.findViewById(R.id.tv_song_lyric_detail);
+                Button btnDismiss = (Button) popupView.findViewById(R.id.btn_dismiss);
                 tvSongId.setText(song.getId());
                 tvSongName.setText(song.getName());
                 tvSongAuthor.setText(song.getAuthor());
@@ -102,6 +108,23 @@ public class SearchFragment extends Fragment {
                     }
                 });
                 mPopupSong.showAsDropDown(mEtSearch, 0, 0);
+            }
+        });
+
+        mWheel.setAdapter(new WheelAdapter() {
+            @Override
+            public Drawable getDrawable(int position) {
+                return getActivity().getDrawable(R.drawable.ic_star);
+            }
+
+            @Override
+            public int getCount() {
+                return 5;
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return null;
             }
         });
 
