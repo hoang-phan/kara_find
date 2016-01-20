@@ -8,4 +8,7 @@
     <string name="name_author_or_lyric">Tên bài hát, tác giả hoặc lời bài hát ...</string>
     <string name="dismiss">Dismiss</string>
     <string name="settings">Cài đặt</string>
+    <string name="mode_free">Nhớ gì ghi nấy nhưng phải đủ từ nha!</string>
+    <string name="mode_first_letter">Tên bài hát viết tắt</string>
+    <string name="mode_name">Tên bài hát (không cần đủ chữ)</string>
 </resources>

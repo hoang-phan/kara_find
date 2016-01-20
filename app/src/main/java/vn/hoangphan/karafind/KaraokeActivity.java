@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
@@ -22,10 +21,11 @@ import vn.hoangphan.karafind.services.GetLinkService;
 import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
 import vn.hoangphan.karafind.views.CustomTabLayout;
+import vn.hoangphan.karafind.views.NonSwipeableViewPager;
 
 public class KaraokeActivity extends ActionBarActivity {
     CustomTabLayout mTabLayout;
-    ViewPager mPager;
+    NonSwipeableViewPager mPager;
     PagerAdapter mAdapter;
     Locale mLocale = null;
 
@@ -108,7 +108,7 @@ public class KaraokeActivity extends ActionBarActivity {
     private void initComponents() {
         mAdapter = new PagerAdapter(getSupportFragmentManager());
         mTabLayout = (CustomTabLayout)findViewById(R.id.tab_layout);
-        mPager = (ViewPager)findViewById(R.id.viewPager);
+        mPager = (NonSwipeableViewPager)findViewById(R.id.viewPager);
     }
 
     private void bindComponents() {
