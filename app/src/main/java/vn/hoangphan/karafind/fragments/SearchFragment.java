@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
@@ -22,14 +21,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
-
-import com.lukedeighton.wheelview.WheelView;
-import com.lukedeighton.wheelview.adapter.WheelAdapter;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import vn.hoangphan.karafind.R;
+import vn.hoangphan.karafind.adapters.ModesAdapter;
 import vn.hoangphan.karafind.adapters.SongsAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.Song;
@@ -47,7 +45,7 @@ public class SearchFragment extends Fragment {
     private ImageView mIcSearch;
     private SongsAdapter mAdapter;
     private PopupWindow mPopupSong;
-    private WheelView mWheel;
+    private Spinner mSpnModes;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,7 +53,7 @@ public class SearchFragment extends Fragment {
         mRvSongs = (RecyclerView)view.findViewById(R.id.rv_songs);
         mEtSearch = (EditText) view.findViewById(R.id.et_search);
         mIcSearch = (ImageView)view.findViewById(R.id.ic_search);
-        mWheel = (WheelView)view.findViewById(R.id.wl_menu);
+        mSpnModes = (Spinner)view.findViewById(R.id.spn_modes);
         mAdapter = new SongsAdapter();
         return view;
     }
@@ -111,22 +109,7 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        mWheel.setAdapter(new WheelAdapter() {
-            @Override
-            public Drawable getDrawable(int position) {
-                return getActivity().getDrawable(R.drawable.ic_star);
-            }
-
-            @Override
-            public int getCount() {
-                return 5;
-            }
-
-            @Override
-            public Object getItem(int position) {
-                return null;
-            }
-        });
+        mSpnModes.setAdapter(new ModesAdapter(getActivity()));
 
         PackageManager packageManager = getActivity().getPackageManager();
         List<ResolveInfo> infos = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
