@@ -61,8 +61,6 @@ public class KaraokeActivity extends ActionBarActivity {
     private void initConfigurations() {
         DatabaseHelper.init(this);
         PreferenceUtils.init(this);
-//        PreferenceUtils.getInstance().clear();
-//        DatabaseHelper.getInstance().resetDb();
 
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 

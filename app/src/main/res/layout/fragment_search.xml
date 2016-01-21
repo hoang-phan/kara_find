@@ -6,21 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Kiểu tìm: "/>
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@null"
-            android:id="@+id/spn_modes" />
-    </LinearLayout>
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,11 +25,14 @@
             android:textColorHighlight="@color/blue_grey_700"
             android:paddingTop="8dp"
             android:paddingBottom="10dp"
-            android:paddingLeft="15dp"
+            android:paddingLeft="45dp" />
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_advance"
+            android:id="@+id/ic_advance"
             />
-
-
-
         <ImageView
             android:layout_width="45dp"
             android:layout_height="45dp"
@@ -52,6 +40,7 @@
             android:id="@+id/ic_search"
             android:layout_gravity="right|center_vertical" />
     </FrameLayout>
+
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
