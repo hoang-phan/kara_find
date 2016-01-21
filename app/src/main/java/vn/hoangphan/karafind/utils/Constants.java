@@ -8,4 +8,6 @@ public interface Constants {
     String INTENT_GET_DATA_LINKS_COMPLETED = "android.intent.action.GET_DATA_LINKS_COMPLETED";
     String LAST_FETCHED_AT = "last_fetched_at";
     String PREFERRED_LANGUAGE = "preferred_lnguage";
+    String MODE = "mode";
+    String TYPE = "type";
 }

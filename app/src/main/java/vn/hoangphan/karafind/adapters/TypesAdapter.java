@@ -13,19 +13,22 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
 /**
  * Created by Hoang Phan on 1/20/2016.
  */
-public class ModesAdapter extends BaseAdapter {
-    public static final int MODE_FREE = 0;
-    public static final int MODE_ABBR = 0;
-    public static final String[] ALL_MODES = { "Tìm tất cả", "Tìm tên viết tắt" };
+public class TypesAdapter extends BaseAdapter {
+    public static final int TYPE_ARIRANG_5 = 0;
+    public static final int TYPE_MUSIC_CORE = 1;
+    public static final int TYPE_VIETKTV = 2;
+    public static final int TYPE_CALI = 3;
+
+    public static final String[] ALL_TYPES = { "Arirang 5", "Music Core", "Viet KTV", "California" };
 
     @Override
     public int getCount() {
-        return 2;
+        return 4;
     }
 
     @Override
     public String getItem(int position) {
-        return ALL_MODES[position];
+        return ALL_TYPES[position];
     }
 
     @Override
@@ -42,7 +45,7 @@ public class ModesAdapter extends BaseAdapter {
     }
 
     private int getLayoutRes(int position) {
-        if (PreferenceUtils.getInstance().getConfigLong(Constants.MODE) == position) {
+        if (PreferenceUtils.getInstance().getConfigLong(Constants.TYPE) == position) {
             return R.layout.item_text_selected;
         } else {
             return R.layout.item_text;
