@@ -4,8 +4,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="5dp"
-    android:layout_marginLeft="20dp">
+    android:padding="@dimen/minor_padding"
+    android:layout_marginLeft="@dimen/common_padding">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -18,10 +18,9 @@
             android:layout_height="match_parent"
             android:textStyle="bold"
             android:textAllCaps="true"
-            android:text="Song's name goes here"
             fontPath="fonts/circle.ttf"
-            android:textSize="20sp"
-            android:textColor="#3333ff"
+            android:textSize="@dimen/secondary_text_size"
+            android:textColor="@color/title"
             android:id="@+id/tv_song_name"
             android:gravity="center_vertical" />
         <TextView
@@ -31,8 +30,8 @@
             android:gravity="center_vertical|center"
             android:text="SONGID"
             android:textStyle="bold"
-            android:textColor="?attr/colorPrimary"
-            android:textSize="@dimen/song_id_text_size"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/title_text_size"
             android:id="@+id/tv_song_id"
             android:layout_gravity="bottom" />
     </LinearLayout>
@@ -46,29 +45,32 @@
             android:orientation="vertical"
             android:id="@+id/ly_song_detail"
             android:layout_height="wrap_content">
-            <TextView
+            <vn.hoangphan.karafind.views.EllipsizingTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/song_lyric_text_size"
-                android:textColor="?attr/colorPrimary"
-                android:text="Short lyric goes here"
+                android:textColor="@color/primary"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:singleLine="false"
                 android:id="@+id/tv_song_lyric"/>
             <TextView
+                android:singleLine="true"
+                android:ellipsize="end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/song_author_text_size"
                 android:textStyle="italic"
-                android:textColor="?attr/colorPrimary"
+                android:textColor="@color/primary"
                 android:text="Author"
-                android:layout_marginTop="2dp"
+                android:layout_marginTop="@dimen/tiny_padding"
                 android:id="@+id/tv_song_author"/>
         </LinearLayout>
         <ImageView
             android:layout_width="0dp"
             android:layout_weight="3"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/secondary_image_size"
             android:layout_gravity="center"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/primary"
             android:src="@drawable/ic_star"
             android:id="@+id/iv_song_favorite"/>
     </LinearLayout>

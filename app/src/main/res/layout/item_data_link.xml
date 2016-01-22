@@ -10,25 +10,25 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SONGID"
-            android:textStyle="bold"
-            android:textSize="22sp"
+            fontPath="fonts/circle.ttf"
+            android:textColor="@color/primary"
+            android:textSize="@dimen/title_text_size"
             android:id="@+id/tv_vol"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SONGID"
-            android:textSize="15sp"
+            android:textSize="@dimen/medium_text_size"
+            android:textColor="@color/title"
             android:id="@+id/tv_updated_at"/>
     </LinearLayout>
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
         <ImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="@dimen/large_image_size"
+            android:layout_height="@dimen/large_image_size"
             android:layout_gravity="center_vertical"
-            android:layout_margin="10dp"
+            android:layout_margin="@dimen/common_padding"
             android:src="@drawable/ic_download"
             android:id="@+id/iv_update" />
         <TextView
@@ -37,6 +37,7 @@
             android:text="@string/updating"
             android:layout_gravity="center_vertical"
             android:id="@+id/tv_updating"
+            android:textColor="@color/title"
             android:visibility="gone"
             />
         <TextView
@@ -45,6 +46,7 @@
             android:text="@string/updated"
             android:layout_gravity="center_vertical"
             android:id="@+id/tv_updated"
+            android:textColor="@color/title"
             android:visibility="gone"
             />
     </FrameLayout>

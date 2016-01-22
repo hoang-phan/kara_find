@@ -73,9 +73,9 @@ public class KaraokeActivity extends ActionBarActivity {
 
         if ("English".equals(Locale.getDefault().getDisplayLanguage())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Language");
-            builder.setMessage("Bạn có muốn sử dụng tiếng Việt?\n(Do you want to use Vietnamese?)");
-            builder.setPositiveButton("Có (OK)", new DialogInterface.OnClickListener() {
+            builder.setTitle(getString(R.string.language_title));
+            builder.setMessage(getString(R.string.language_choose_message));
+            builder.setPositiveButton(getString(R.string.language_vi), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     mLocale = new Locale("vi");
@@ -84,7 +84,7 @@ public class KaraokeActivity extends ActionBarActivity {
                     proceed();
                 }
             });
-            builder.setNegativeButton("Không (No, thanks)", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(getString(R.string.language_other), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     PreferenceUtils.getInstance().saveConfig(Constants.PREFERRED_LANGUAGE, "en");

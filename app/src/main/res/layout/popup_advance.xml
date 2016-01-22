@@ -7,8 +7,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#cc334499"
-        android:padding="10dp">
+        android:background="@color/secondary_transparent"
+        android:padding="@dimen/common_padding">
         <ListView
             android:layout_width="0dp"
             android:layout_weight="1"

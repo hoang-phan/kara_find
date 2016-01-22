@@ -5,8 +5,17 @@
     <color name="blue_grey_700">#455A64</color>
     <color name="blue_grey_800">#37474F</color>
     <color name="blue_grey_900">#263238</color>
+    <color name="advance_selected">#5555cc</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="tab_background_selected">?attr/colorAccent</color>
-    <color name="tab_background_unselected">?attr/colorPrimary</color>
+    <color name="color_accent">#83ddee</color>
+    <color name="title">#3333ff</color>
+    <color name="primary">#960a0a</color>
+    <color name="secondary">#f78b24</color>
+    <color name="secondary_transparent">#cc334499</color>
+    <color name="secondary_transparent_selected">#ccccaa33</color>
+    <color name="text_hint">#eeeeee</color>
+    <color name="search_transparent">#aa37aecc</color>
+    <color name="secondary_light">#ffc94e</color>
+    <color name="tab_unselected">#3f51b5</color>
 </resources>
