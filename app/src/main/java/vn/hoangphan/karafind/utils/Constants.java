@@ -10,4 +10,12 @@ public interface Constants {
     String PREFERRED_LANGUAGE = "preferred_lnguage";
     String MODE = "mode";
     String TYPE = "type";
+
+    int MODE_FREE = 0;
+    int MODE_ABBR = 1;
+
+    int TYPE_ARIRANG_5 = 0;
+    int TYPE_MUSIC_CORE = 1;
+    int TYPE_VIETKTV = 2;
+    int TYPE_CALI = 3;
 }

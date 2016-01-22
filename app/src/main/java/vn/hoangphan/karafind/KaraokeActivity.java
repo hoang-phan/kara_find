@@ -131,6 +131,7 @@ public class KaraokeActivity extends ActionBarActivity {
             }
         });
         mPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
+        mPager.setOffscreenPageLimit(3);
 
         if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT))) {
             startService(new Intent(this, GetLinkService.class));

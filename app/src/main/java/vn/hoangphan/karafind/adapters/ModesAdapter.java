@@ -14,8 +14,6 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
  * Created by Hoang Phan on 1/20/2016.
  */
 public class ModesAdapter extends BaseAdapter {
-    public static final int MODE_FREE = 0;
-    public static final int MODE_ABBR = 0;
     public static final String[] ALL_MODES = { "Tìm tất cả", "Tìm tên viết tắt" };
 
     @Override
