@@ -1,6 +1,5 @@
 package vn.hoangphan.karafind.adapters;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -79,7 +78,7 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
             mTvId.setText(song.getId());
             mTvName.setText(song.getName());
             mTvAuthor.setText(song.getAuthor());
-            mTvLyric.setText(song.getLyric().substring(0, Math.min(40, song.getLyric().length())) + "...");
+            mTvLyric.setText(song.getLyric());
             mIvFavorited.setImageResource(song.isFavorited() ? R.drawable.ic_star : R.drawable.ic_star_off);
 
             mLySongDetail.setOnClickListener(new View.OnClickListener() {

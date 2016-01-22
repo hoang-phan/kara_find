@@ -1,16 +1,15 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="colorPrimary">#960a0a</item>
+        <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">#eea7cb</item>
-        <item name="colorAccent">#83ddee</item>
+        <item name="colorAccent">@color/color_accent</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
 
     <style name="CustomTabLayout" parent="Widget.Design.TabLayout">
         <item name="tabTextAppearance">@style/CustomTabText</item>
-        <item name="tabSelectedTextColor">#3333ff</item>
         <item name="tabIndicatorHeight">0dp</item>
         <item name="tabBackground">@drawable/tab_color_selector</item>
     </style>

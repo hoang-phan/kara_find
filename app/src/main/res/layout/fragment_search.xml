@@ -9,7 +9,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp">
+        android:layout_margin="@dimen/common_padding">
 
         <EditText
             android:layout_width="match_parent"
@@ -18,24 +18,24 @@
             android:singleLine="true"
             android:hint="@string/name_author_or_lyric"
             android:background="@drawable/edit_text_round"
-            android:textSize="14sp"
+            android:textSize="@dimen/search_text_size"
             android:textColor="@color/white"
-            android:textColorHint="#eeeeee"
+            android:textColorHint="@color/text_hint"
             android:shadowColor="@color/blue_grey_600"
             android:textColorHighlight="@color/blue_grey_700"
-            android:paddingTop="8dp"
-            android:paddingBottom="10dp"
-            android:paddingLeft="45dp" />
+            android:paddingTop="@dimen/edit_text_padding_top"
+            android:paddingBottom="@dimen/common_padding"
+            android:paddingLeft="@dimen/common_image_size" />
         <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="@dimen/secondary_image_size"
+            android:layout_height="@dimen/secondary_image_size"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_advance"
             android:id="@+id/ic_advance"
             />
         <ImageView
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="@dimen/common_image_size"
+            android:layout_height="@dimen/common_image_size"
             android:src="@drawable/ic_voice"
             android:id="@+id/ic_search"
             android:layout_gravity="right|center_vertical" />

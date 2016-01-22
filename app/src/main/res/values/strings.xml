@@ -12,4 +12,8 @@
     <string name="mode_first_letter">Tên bài hát viết tắt</string>
     <string name="mode_name">Tên bài hát (không cần đủ chữ)</string>
     <string name="say_words">Nói cụm từ muốn tìm kiếm:</string>
+    <string name="language_choose_message">Bạn có muốn sử dụng tiếng Việt?\n(Do you want to use Vietnamese?)</string>
+    <string name="language_vi">Có (OK)</string>
+    <string name="language_other">Không (No, thanks)</string>
+    <string name="language_title">Language</string>
 </resources>
