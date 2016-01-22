@@ -12,4 +12,13 @@ public class LanguageUtils {
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(temp).replaceAll("").toUpperCase().replaceAll("Đ", "D");
     }
+
+    public static String getFirstLetters(String src) {
+        String[] words = src.split("[ ,.?!:]+");
+        String result = "";
+        for (String word : words) {
+            result += word.charAt(0);
+        }
+        return result;
+    }
 }

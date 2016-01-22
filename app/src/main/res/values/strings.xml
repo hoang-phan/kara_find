@@ -11,4 +11,5 @@
     <string name="mode_free">Nhớ gì ghi nấy nhưng phải đủ từ nha!</string>
     <string name="mode_first_letter">Tên bài hát viết tắt</string>
     <string name="mode_name">Tên bài hát (không cần đủ chữ)</string>
+    <string name="say_words">Nói cụm từ muốn tìm kiếm:</string>
 </resources>

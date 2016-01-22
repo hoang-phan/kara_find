@@ -16,6 +16,7 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,8 +35,10 @@ import vn.hoangphan.karafind.adapters.SongsAdapter;
 import vn.hoangphan.karafind.adapters.TypesAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.Song;
+import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.OnSongDetailClick;
+import vn.hoangphan.karafind.utils.PreferenceUtils;
 
 /**
  * Created by Hoang Phan on 1/12/2016.
@@ -52,6 +55,11 @@ public class SearchFragment extends Fragment {
     private TypesAdapter mTypesAdapter;
     private PopupWindow mPopupSong;
     private PopupWindow mPopupSearch;
+    private TextView mTvSongId;
+    private TextView mTvSongName;
+    private TextView mTvSongAuthor;
+    private TextView mTvSongLyric;
+    private Button mBtnDismiss;
     private ListView mLvModes;
     private ListView mLvTypes;
     private LayoutInflater mInflater;
@@ -64,16 +72,45 @@ public class SearchFragment extends Fragment {
         mIcSearch = (ImageView)view.findViewById(R.id.ic_search);
         mIcAdvance = (ImageView)view.findViewById(R.id.ic_advance);
         mSongAdapter = new SongsAdapter();
-        mInflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mInflater = inflater;
 
-        View popupView = mInflater.inflate(R.layout.popup_advance, null);
-        mLvModes = (ListView)popupView.findViewById(R.id.lv_modes);
-        mLvTypes = (ListView)popupView.findViewById(R.id.lv_types);
+        View advancePopupView = mInflater.inflate(R.layout.popup_advance, null);
+        mLvModes = (ListView)advancePopupView.findViewById(R.id.lv_modes);
+        mLvTypes = (ListView)advancePopupView.findViewById(R.id.lv_types);
         mModesAdapter = new ModesAdapter();
         mTypesAdapter = new TypesAdapter();
         mLvModes.setAdapter(mModesAdapter);
         mLvTypes.setAdapter(mTypesAdapter);
-        mPopupSearch = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mLvModes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                PreferenceUtils.getInstance().saveConfig(Constants.MODE, position);
+                mModesAdapter.notifyDataSetChanged();
+            }
+        });
+        mLvTypes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                PreferenceUtils.getInstance().saveConfig(Constants.TYPE, position);
+                mTypesAdapter.notifyDataSetChanged();
+            }
+        });
+        mPopupSearch = new PopupWindow(advancePopupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        View songPopupView = mInflater.inflate(R.layout.popup_song_detail, null);
+        mTvSongId = (TextView) songPopupView.findViewById(R.id.tv_song_id_detail);
+        mTvSongName = (TextView) songPopupView.findViewById(R.id.tv_song_name_detail);
+        mTvSongAuthor = (TextView) songPopupView.findViewById(R.id.tv_song_author_detail);
+        mTvSongLyric = (TextView) songPopupView.findViewById(R.id.tv_song_lyric_detail);
+        mBtnDismiss = (Button) songPopupView.findViewById(R.id.btn_dismiss);
+
+        mPopupSong = new PopupWindow(songPopupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        mBtnDismiss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPopupSong.dismiss();
+            }
+        });
         return view;
     }
 
@@ -113,24 +150,10 @@ public class SearchFragment extends Fragment {
         mSongAdapter.setOnSongDetailClick(new OnSongDetailClick() {
             @Override
             public void view(Song song) {
-
-                View popupView = mInflater.inflate(R.layout.popup_song_detail, null);
-                TextView tvSongId = (TextView) popupView.findViewById(R.id.tv_song_id_detail);
-                TextView tvSongName = (TextView) popupView.findViewById(R.id.tv_song_name_detail);
-                TextView tvSongAuthor = (TextView) popupView.findViewById(R.id.tv_song_author_detail);
-                TextView tvSongLyric = (TextView) popupView.findViewById(R.id.tv_song_lyric_detail);
-                Button btnDismiss = (Button) popupView.findViewById(R.id.btn_dismiss);
-                tvSongId.setText(song.getId());
-                tvSongName.setText(song.getName());
-                tvSongAuthor.setText(song.getAuthor());
-                tvSongLyric.setText(song.getLyric());
-                mPopupSong = new PopupWindow(popupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                btnDismiss.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mPopupSong.dismiss();
-                    }
-                });
+                mTvSongId.setText(song.getId());
+                mTvSongName.setText(song.getName());
+                mTvSongAuthor.setText(song.getAuthor());
+                mTvSongLyric.setText(song.getLyric());
                 mPopupSong.showAsDropDown(mEtSearch, 0, 0);
             }
         });
@@ -146,7 +169,14 @@ public class SearchFragment extends Fragment {
         if (TextUtils.isEmpty(filter)){
             mSongAdapter.setSongs(DatabaseHelper.getInstance().allSongs());
         } else {
-            mSongAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(filter));
+            switch ((int)PreferenceUtils.getInstance().getConfigLong(Constants.MODE)) {
+                case Constants.MODE_FREE:
+                    mSongAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(filter));
+                    break;
+                case Constants.MODE_ABBR:
+                    mSongAdapter.setSongs(DatabaseHelper.getInstance().getSongsWithFirstLetters(filter));
+                    break;
+            }
         }
         mSongAdapter.notifyDataSetChanged();
     }
@@ -162,7 +192,7 @@ public class SearchFragment extends Fragment {
     private void startVoiceRecognition() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi");
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Nói tên bài hát hoặc một phần lời bài hát...");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getResources().getString(R.string.say_words));
         startActivityForResult(intent, REQUEST_CODE);
     }
 

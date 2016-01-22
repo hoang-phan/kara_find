@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +28,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_SONG_ID = "song_id";
     public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_ABBR = "abbr";
     public static final String COLUMN_LYRIC = "lyric";
     public static final String COLUMN_AUTHOR = "author";
     public static final String COLUMN_VOL = "vol";
@@ -37,7 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final int VALUE_TRUE = 1;
 
-    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer default 0, %s text, %s text)";
+    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer default 0, %s text, %s text, %s text)";
     public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
     public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer default 0, %s integer default 0)";
 
@@ -63,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR));
         db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_VERSION));
         db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_LYRICS, COLUMN_UTF));
         db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_INFO, COLUMN_INFO_UTF));
@@ -86,7 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertSongs(List<Song> songs) {
-        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s, %9$s) VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT %8$s FROM %1$s WHERE %2$s = ? LIMIT 1));", TABLE_SONGS, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_FAVORITED);
+        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s, %9$s, %10$s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT %8$s FROM %1$s WHERE %2$s = ? LIMIT 1));", TABLE_SONGS, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR, COLUMN_FAVORITED);
         SQLiteDatabase db = getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(insertSql);
         db.beginTransaction();
@@ -99,7 +101,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             statement.bindLong(5, song.getVol());
             statement.bindString(6, LanguageUtils.translateToUtf(song.getLyric()));
             statement.bindString(7, LanguageUtils.translateToUtf(song.getName() + " " + song.getAuthor() + " " + song.getId()));
-            statement.bindString(8, song.getId());
+            statement.bindString(8, LanguageUtils.translateToUtf(LanguageUtils.getFirstLetters(song.getName())));
+            statement.bindString(9, song.getId());
             statement.execute();
         }
         db.setTransactionSuccessful();
@@ -148,35 +151,59 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<Song> songsMatch(String filter) {
+        long current = System.currentTimeMillis();
         ArrayList<Song> songs = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
         String matchLyricSql = String.format(SELECT_FTS, TABLE_FTS_LYRICS, COLUMN_UTF);
         String matchSongSql = String.format(SELECT_FTS, TABLE_FTS_INFO, COLUMN_INFO_UTF);
 
-        Cursor res = db.rawQuery(String.format("SELECT %1$s.*, fts.sum_rank FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%2$s UNION ALL %3$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC", TABLE_SONGS, matchLyricSql, matchSongSql, COLUMN_ID), new String[]{filter, filter });
+        Cursor res = db.rawQuery(String.format("SELECT %1$s.* FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%2$s UNION ALL %3$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC", TABLE_SONGS, matchLyricSql, matchSongSql, COLUMN_ID), new String[]{filter, filter });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
             songs.add(getSong(res));
             res.moveToNext();
         }
+
+        Log.e("Database query time: ", (System.currentTimeMillis() - current) + " milliseconds");
+
+        return songs;
+    }
+
+    public List<Song> getSongsWithFirstLetters(String filter) {
+        long current = System.currentTimeMillis();
+        ArrayList<Song> songs = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor res = db.rawQuery(String.format("SELECT * FROM %1$s WHERE %2$s LIKE ? ORDER BY LENGTH(%2$s) LIMIT 20", TABLE_SONGS, COLUMN_ABBR), new String[] { filter + "%" });
+        res.moveToFirst();
+
+        while (!res.isAfterLast()) {
+            songs.add(getSong(res));
+            res.moveToNext();
+        }
+
+        Log.e("Database query time: ", (System.currentTimeMillis() - current) + " milliseconds");
 
         return songs;
     }
 
     public List<Song> allSongs() {
+        long current = System.currentTimeMillis();
         ArrayList<Song> songs = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
 
-        Cursor res = db.rawQuery(String.format("SELECT * FROM %s ORDER BY %s LIMIT 40", TABLE_SONGS, COLUMN_NAME), null);
+        Cursor res = db.rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s ORDER BY %2$s LIMIT 40", TABLE_SONGS, COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), null);
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
             songs.add(getSong(res));
             res.moveToNext();
         }
+        Log.e("Database query time: ", (System.currentTimeMillis() - current) + " milliseconds");
 
         return songs;
     }

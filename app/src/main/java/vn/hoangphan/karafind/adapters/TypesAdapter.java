@@ -14,11 +14,6 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
  * Created by Hoang Phan on 1/20/2016.
  */
 public class TypesAdapter extends BaseAdapter {
-    public static final int TYPE_ARIRANG_5 = 0;
-    public static final int TYPE_MUSIC_CORE = 1;
-    public static final int TYPE_VIETKTV = 2;
-    public static final int TYPE_CALI = 3;
-
     public static final String[] ALL_TYPES = { "Arirang 5", "Music Core", "Viet KTV", "California" };
 
     @Override
