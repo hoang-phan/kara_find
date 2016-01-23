@@ -46,6 +46,7 @@ public class UpdateService extends IntentService {
 
             String link = dataLink.getLink();
             int vol = dataLink.getVol();
+            String stype = dataLink.getStype();
 
             if (vol >= 0) {
                 try {
@@ -70,6 +71,7 @@ public class UpdateService extends IntentService {
                         song.setAuthor(parts[column_author]);
                         song.setLyric(parts[column_lyric]);
                         song.setVol(vol);
+                        song.setStype(stype);
                         songs.add(song);
                     }
                     long time2 = System.currentTimeMillis();
@@ -85,6 +87,7 @@ public class UpdateService extends IntentService {
                 }
             }
             DatabaseHelper.getInstance().prepareFTSTables();
+            sendBroadcast(new Intent(Constants.INTENT_UPDATED_COMPLETED));
 
             mIsRunning = false;
         }

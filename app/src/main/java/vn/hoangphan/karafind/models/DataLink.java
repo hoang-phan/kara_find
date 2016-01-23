@@ -17,6 +17,8 @@ public class DataLink {
 
     private long version;
 
+    private String stype;
+
     public int getVol() {
         return vol;
     }
@@ -47,5 +49,24 @@ public class DataLink {
 
     public void setVersion(long version) {
         this.version = version;
+    }
+
+    public String getStype() {
+        return stype;
+    }
+
+    public void setStype(String stype) {
+        this.stype = stype;
+    }
+
+    @Override
+    public String toString() {
+        return "DataLink{" +
+                "vol=" + vol +
+                ", link='" + link + '\'' +
+                ", updatedAt=" + updatedAt +
+                ", version=" + version +
+                ", stype='" + stype + '\'' +
+                '}';
     }
 }

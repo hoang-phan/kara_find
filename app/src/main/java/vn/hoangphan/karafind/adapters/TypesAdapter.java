@@ -14,16 +14,14 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
  * Created by Hoang Phan on 1/20/2016.
  */
 public class TypesAdapter extends BaseAdapter {
-    public static final String[] ALL_TYPES = { "Arirang 5", "Music Core", "Viet KTV", "California" };
-
     @Override
     public int getCount() {
-        return 4;
+        return Constants.ALL_TYPES.length;
     }
 
     @Override
     public String getItem(int position) {
-        return ALL_TYPES[position];
+        return Constants.ALL_TYPES[position];
     }
 
     @Override

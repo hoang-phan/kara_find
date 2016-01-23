@@ -35,7 +35,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     @Override
     public void onBindViewHolder(final DataLinkHolder holder, final int position) {
         final DataLink dataLink = mDataLinks.get(position);
-        holder.mTvVol.setText("VOL " + dataLink.getVol());
+        holder.mTvVol.setText("VOL " + dataLink.getVol() + " - " + dataLink.getStype());
         holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
         if (dataLink.getVersion() != 0 && dataLink.getUpdatedAt() == dataLink.getVersion()) {
             holder.mIvUpdate.setVisibility(View.GONE);
@@ -81,7 +81,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
 
         public DataLinkHolder(View view) {
             super(view);
-            mTvVol = (TextView) view.findViewById(R.id.tv_vol);
+            mTvVol = (TextView) view.findViewById(R.id.tv_vol_type);
             mTvUpdatedAt = (TextView) view.findViewById(R.id.tv_updated_at);
             mTvUpdating = (TextView) view.findViewById(R.id.tv_updating);
             mTvUpdated = (TextView) view.findViewById(R.id.tv_updated);

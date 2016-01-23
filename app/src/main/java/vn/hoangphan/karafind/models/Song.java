@@ -9,6 +9,7 @@ public class Song {
     private String author;
     private String id;
     private String utf;
+    private String stype;
 
     private boolean favorited;
 
@@ -68,5 +69,13 @@ public class Song {
 
     public void setUtf(String utf) {
         this.utf = utf;
+    }
+
+    public String getStype() {
+        return stype;
+    }
+
+    public void setStype(String stype) {
+        this.stype = stype;
     }
 }
