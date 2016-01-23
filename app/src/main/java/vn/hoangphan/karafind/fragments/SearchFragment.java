@@ -1,10 +1,14 @@
 package vn.hoangphan.karafind.fragments;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.Fragment;
@@ -63,6 +67,7 @@ public class SearchFragment extends Fragment {
     private ListView mLvModes;
     private ListView mLvTypes;
     private LayoutInflater mInflater;
+    private BroadcastReceiver mReceiver;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -86,6 +91,7 @@ public class SearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PreferenceUtils.getInstance().saveConfig(Constants.MODE, position);
                 mModesAdapter.notifyDataSetChanged();
+                filterSongs();
             }
         });
         mLvTypes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -93,6 +99,7 @@ public class SearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PreferenceUtils.getInstance().saveConfig(Constants.TYPE, position);
                 mTypesAdapter.notifyDataSetChanged();
+                filterSongs();
             }
         });
         mPopupSearch = new PopupWindow(advancePopupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -185,6 +192,9 @@ public class SearchFragment extends Fragment {
         if (mPopupSearch.isShowing()) {
             mPopupSearch.dismiss();
         } else {
+            mPopupSearch.setFocusable(true);
+            mPopupSearch.setOutsideTouchable(true);
+            mPopupSearch.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             mPopupSearch.showAsDropDown(mIcAdvance, 0, 0);
         }
     }
@@ -217,5 +227,25 @@ public class SearchFragment extends Fragment {
             mPopupSearch.dismiss();
         }
         super.onDestroy();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(Constants.INTENT_UPDATED_COMPLETED);
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                filterSongs();
+            }
+        };
+
+        getActivity().registerReceiver(mReceiver, intentFilter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(mReceiver);
     }
 }

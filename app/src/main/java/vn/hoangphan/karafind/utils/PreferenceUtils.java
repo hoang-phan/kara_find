@@ -45,7 +45,7 @@ public class PreferenceUtils {
         return mPreferences.getString(key, "");
     }
 
-    public void clear() {
+    public void reset() {
         mEdit.clear().commit();
     }
 }

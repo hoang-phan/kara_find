@@ -24,4 +24,11 @@ public class DataLinksResponse {
     public void setDataLinks(List<DataLink> dataLinks) {
         this.dataLinks = dataLinks;
     }
+
+    @Override
+    public String toString() {
+        return "DataLinksResponse{" +
+                "dataLinks=" + dataLinks +
+                '}';
+    }
 }
