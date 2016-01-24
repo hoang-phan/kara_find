@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,8 @@ public class UpdateFragment extends Fragment {
     private CheckBox mCbSelectAll;
     private Button mBtnUpdate;
     private TextView mTvSelectAll;
+    private LinearLayout mLyHeader;
+    private LinearLayout mLyHeaderNone;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,6 +45,8 @@ public class UpdateFragment extends Fragment {
         mCbSelectAll = (CheckBox)view.findViewById(R.id.cb_select_all);
         mTvSelectAll = (TextView) view.findViewById(R.id.tv_select_all);
         mBtnUpdate = (Button) view.findViewById(R.id.btn_update);
+        mLyHeader = (LinearLayout) view.findViewById(R.id.ly_update_header);
+        mLyHeaderNone = (LinearLayout) view.findViewById(R.id.ly_update_header_none);
         return view;
     }
 
@@ -52,6 +57,7 @@ public class UpdateFragment extends Fragment {
         mRvDataLinks.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
         mAdapter.notifyDataSetChanged();
+        checkLinksCount();
         mCbSelectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -85,13 +91,15 @@ public class UpdateFragment extends Fragment {
             public void onReceive(Context context, Intent intent) {
                 long start = System.currentTimeMillis();
                 String label = intent.getStringExtra(Constants.VOL_LABEL);
+                mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
                 if (label != null) {
                     Toast.makeText(getActivity(), String.format(getString(R.string.updated), label), Toast.LENGTH_SHORT).show();
+                } else {
+                    mCbSelectAll.setChecked(false);
+                    mCbSelectAll.setChecked(true);
                 }
-                mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
                 mAdapter.notifyDataSetChanged();
-                mCbSelectAll.setChecked(false);
-                mCbSelectAll.setChecked(true);
+                checkLinksCount();
                 Log.d("Receive time: ", (System.currentTimeMillis() - start) + " millis");
             }
         };
@@ -103,5 +111,15 @@ public class UpdateFragment extends Fragment {
     public void onPause() {
         getActivity().unregisterReceiver(mReceiver);
         super.onPause();
+    }
+
+    private void checkLinksCount() {
+        if (mAdapter.getItemCount() == 0) {
+            mLyHeader.setVisibility(View.GONE);
+            mLyHeaderNone.setVisibility(View.VISIBLE);
+        } else {
+            mLyHeaderNone.setVisibility(View.GONE);
+            mLyHeader.setVisibility(View.VISIBLE);
+        }
     }
 }

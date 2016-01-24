@@ -1,5 +1,7 @@
 package vn.hoangphan.karafind.adapters;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
@@ -15,6 +17,7 @@ import java.util.List;
 import vn.hoangphan.karafind.R;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.Song;
+import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.OnSongDetailClick;
 
 /**
@@ -23,6 +26,11 @@ import vn.hoangphan.karafind.utils.OnSongDetailClick;
 public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
     private List<Song> mSongs = new ArrayList<>();
     private static OnSongDetailClick mOnSongDetailClick = null;
+    private Activity mActivity;
+
+    public SongsAdapter(Activity activity) {
+        mActivity = activity;
+    }
 
     @Override
     public SongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -42,6 +50,7 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
                 mSongs.remove(position);
                 mSongs.add(position, song);
                 notifyDataSetChanged();
+                mActivity.sendBroadcast(new Intent(Constants.INTENT_FAVORITE));
             }
         });
     }
