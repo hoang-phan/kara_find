@@ -73,7 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DROP_INDEX_SQL = "DROP INDEX IF EXISTS `index_%2$s_%1$s`";
     public static final String DROP_INDEXES_SQL = "DROP INDEX IF EXISTS `index_%2$s_%3$s_%1$s`";
 
-    public static final String SELECT_FTS = "SELECT docid, HEX(MATCHINFO(%1$s, 's')) AS rank, LENGTH(%2$s) AS len FROM %1$s WHERE %1$s MATCH ?";
+    public static final String SELECT_FTS = "SELECT docid, '%3$s' || HEX(MATCHINFO(%1$s, 's')) AS rank, LENGTH(%2$s) AS len FROM %1$s WHERE %1$s MATCH ?";
 
     private static DatabaseHelper instance = null;
 
@@ -224,10 +224,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         int type = getCurrentType();
-        String matchLyricSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF);
-        String matchSongSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF);
+        String matchLyricSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF, "0");
+        String matchSongSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF, "1");
 
-        Cursor res = db.rawQuery(String.format("SELECT %1$s.* FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%2$s UNION ALL %3$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_ID), new String[]{ filter, filter });
+        Cursor res = db.rawQuery(String.format("SELECT %1$s.* FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%3$s UNION ALL %2$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_ID), new String[]{ filter, filter });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
@@ -266,6 +266,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
 
         Cursor res = db.rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s ORDER BY %2$s LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), null);
+        res.moveToFirst();
+
+        while (!res.isAfterLast()) {
+            songs.add(getSong(res));
+            res.moveToNext();
+        }
+        Log.e("Database query time: ", (System.currentTimeMillis() - current) + " milliseconds");
+
+        return songs;
+    }
+
+    public List<Song> favoritedSongs() {
+        long current = System.currentTimeMillis();
+        ArrayList<Song> songs = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor res = db.rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s WHERE %7$s = ? ORDER BY %2$s LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), new String[] { "1" });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {

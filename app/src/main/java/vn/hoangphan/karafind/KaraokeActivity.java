@@ -60,7 +60,6 @@ public class KaraokeActivity extends ActionBarActivity {
     private void initConfigurations() {
         DatabaseHelper.init(this);
         PreferenceUtils.init(this);
-        DatabaseHelper.getInstance().prepareFTSTables();
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
         if (!TextUtils.isEmpty(language)) {
@@ -93,6 +92,8 @@ public class KaraokeActivity extends ActionBarActivity {
             builder.setCancelable(false);
             builder.setIcon(R.mipmap.ic_launcher);
             builder.create().show();
+        } else {
+            proceed();
         }
     }
 
@@ -113,6 +114,7 @@ public class KaraokeActivity extends ActionBarActivity {
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.search).setIcon(R.drawable.ic_search));
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.update).setIcon(R.drawable.ic_update));
         mTabLayout.addTab(mTabLayout.newTab().setText(R.string.settings).setIcon(R.drawable.ic_settings));
+        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.favorite).setIcon(R.drawable.ic_star));
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

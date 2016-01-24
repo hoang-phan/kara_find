@@ -5,6 +5,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/ly_update_header_none"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:visibility="gone">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            fontPath="fonts/circle.ttf"
+            android:textColor="@color/primary"
+            android:layout_gravity="center"
+            android:text="@string/no_update"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/ly_update_header"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/minor_padding">
         <CheckBox

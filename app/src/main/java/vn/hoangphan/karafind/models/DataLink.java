@@ -69,4 +69,25 @@ public class DataLink {
                 ", stype='" + stype + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DataLink dataLink = (DataLink) o;
+
+        if (vol != dataLink.vol) return false;
+        if (link != null ? !link.equals(dataLink.link) : dataLink.link != null) return false;
+        return stype.equals(dataLink.stype);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = vol;
+        result = 31 * result + (link != null ? link.hashCode() : 0);
+        result = 31 * result + stype.hashCode();
+        return result;
+    }
 }

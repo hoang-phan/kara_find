@@ -4,6 +4,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import vn.hoangphan.karafind.fragments.FavoriteFragment;
 import vn.hoangphan.karafind.fragments.SearchFragment;
 import vn.hoangphan.karafind.fragments.SettingsFragment;
 import vn.hoangphan.karafind.fragments.UpdateFragment;
@@ -12,6 +13,7 @@ public class PagerAdapter extends FragmentPagerAdapter {
     public static final int TAB_SEARCH = 0;
     public static final int TAB_UPDATE = 1;
     public static final int TAB_SETTINGS = 2;
+    public static final int TAB_FAVORITE = 3;
 
     FragmentManager mManager;
 
@@ -29,12 +31,14 @@ public class PagerAdapter extends FragmentPagerAdapter {
                 return new UpdateFragment();
             case TAB_SETTINGS:
                 return new SettingsFragment();
+            case TAB_FAVORITE:
+                return new FavoriteFragment();
         }
         return null;
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 }

@@ -26,7 +26,7 @@ import vn.hoangphan.karafind.utils.CalendarUtils;
 public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     private List<DataLink> mDataLinks = new ArrayList<>();
     private Set<Integer> mSelectedPositions = new HashSet<>();
-    private Set<Integer> mUpdatingPositions = new HashSet<>();
+    private Set<DataLink> mUpdatingLinks = new HashSet<>();
     private Activity mActivity;
 
     public DataLinksAdapter(Activity activity) {
@@ -44,7 +44,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         final DataLink dataLink = mDataLinks.get(position);
         holder.mTvVol.setText("VOL " + dataLink.getVol());
         holder.mTvType.setText(dataLink.getStype());
-        if (mUpdatingPositions.contains(position)) {
+        if (mUpdatingLinks.contains(dataLink)) {
             holder.mCbSelect.setVisibility(View.INVISIBLE);
             holder.mTvUpdatedAt.setText(R.string.updating);
         } else {
@@ -79,9 +79,11 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
 
     public void updateSelected() {
         for (int position : mSelectedPositions) {
-            UpdateService.pushLink(mDataLinks.get(position));
+            DataLink link = mDataLinks.get(position);
+            UpdateService.pushLink(link);
+            mUpdatingLinks.add(link);
         }
-        mUpdatingPositions.addAll(mSelectedPositions);
+        mSelectedPositions.clear();
         notifyDataSetChanged();
         mActivity.startService(new Intent(mActivity, UpdateService.class));
     }

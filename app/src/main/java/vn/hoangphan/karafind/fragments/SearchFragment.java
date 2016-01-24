@@ -55,13 +55,7 @@ public class SearchFragment extends Fragment {
     private SongsAdapter mSongAdapter;
     private ModesAdapter mModesAdapter;
     private TypesAdapter mTypesAdapter;
-    private PopupWindow mPopupSong;
     private PopupWindow mPopupSearch;
-    private TextView mTvSongId;
-    private TextView mTvSongName;
-    private TextView mTvSongAuthor;
-    private TextView mTvSongLyric;
-    private Button mBtnDismiss;
     private ListView mLvModes;
     private ListView mLvTypes;
     private LayoutInflater mInflater;
@@ -74,7 +68,7 @@ public class SearchFragment extends Fragment {
         mEtSearch = (EditText) view.findViewById(R.id.et_search);
         mIcSearch = (ImageView)view.findViewById(R.id.ic_search);
         mIcAdvance = (ImageView)view.findViewById(R.id.ic_advance);
-        mSongAdapter = new SongsAdapter();
+        mSongAdapter = new SongsAdapter(getActivity());
         mInflater = inflater;
 
         View advancePopupView = mInflater.inflate(R.layout.popup_advance, null);
@@ -101,21 +95,6 @@ public class SearchFragment extends Fragment {
             }
         });
         mPopupSearch = new PopupWindow(advancePopupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-
-        View songPopupView = mInflater.inflate(R.layout.popup_song_detail, null);
-        mTvSongId = (TextView) songPopupView.findViewById(R.id.tv_song_id_detail);
-        mTvSongName = (TextView) songPopupView.findViewById(R.id.tv_song_name_detail);
-        mTvSongAuthor = (TextView) songPopupView.findViewById(R.id.tv_song_author_detail);
-        mTvSongLyric = (TextView) songPopupView.findViewById(R.id.tv_song_lyric_detail);
-        mBtnDismiss = (Button) songPopupView.findViewById(R.id.btn_dismiss);
-
-        mPopupSong = new PopupWindow(songPopupView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        mBtnDismiss.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPopupSong.dismiss();
-            }
-        });
         return view;
     }
 
@@ -155,11 +134,15 @@ public class SearchFragment extends Fragment {
         mSongAdapter.setOnSongDetailClick(new OnSongDetailClick() {
             @Override
             public void view(Song song) {
-                mTvSongId.setText(song.getId());
-                mTvSongName.setText(song.getName());
-                mTvSongAuthor.setText(song.getAuthor());
-                mTvSongLyric.setText(song.getLyric());
-                mPopupSong.showAsDropDown(mEtSearch, 0, 0);
+                SongDetailsFragment songDetailsFragment = new SongDetailsFragment();
+                Bundle args = new Bundle();
+                args.putString(Constants.SONG_ID, song.getId());
+                args.putString(Constants.SONG_NAME, song.getName());
+                args.putString(Constants.SONG_LYRIC, song.getLyric());
+                args.putString(Constants.SONG_AUTHOR, song.getAuthor());
+                songDetailsFragment.setArguments(args);
+
+                getActivity().getSupportFragmentManager().beginTransaction().add(R.id.frame_main, songDetailsFragment).commit();
             }
         });
 
@@ -218,9 +201,6 @@ public class SearchFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (mPopupSong != null && mPopupSong.isShowing()) {
-            mPopupSong.dismiss();
-        }
         if (mPopupSearch != null && mPopupSearch.isShowing()) {
             mPopupSearch.dismiss();
         }
