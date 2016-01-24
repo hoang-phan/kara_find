@@ -11,8 +11,15 @@ public interface Constants {
     String PREFERRED_LANGUAGE = "preferred_lnguage";
     String MODE = "mode";
     String TYPE = "type";
+    String VOL_LABEL = "vol_label";
 
-    String[] ALL_TYPES = { "Arirang 5", "Music Core", "Viet KTV", "California", "Arirang English" };
+    String TYPE_AR5 = "Arirang 5";
+    String TYPE_MSC = "Music Core";
+    String TYPE_KTV = "Viet KTV";
+    String TYPE_CAL = "California";
+    String TYPE_ARE = "Arirang English";
+
+    String[] ALL_TYPES = { TYPE_AR5, TYPE_MSC, TYPE_KTV, TYPE_CAL, TYPE_ARE };
 
     int MODE_FREE = 0;
     int MODE_ABBR = 1;

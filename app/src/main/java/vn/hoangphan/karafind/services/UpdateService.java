@@ -42,6 +42,7 @@ public class UpdateService extends IntentService {
         mIsRunning = true;
         DataLink dataLink;
         while (mLinks.size() > 0) {
+            long start = System.currentTimeMillis();
             dataLink = mLinks.remove();
 
             String link = dataLink.getLink();
@@ -71,18 +72,23 @@ public class UpdateService extends IntentService {
                         song.setAuthor(parts[column_author]);
                         song.setLyric(parts[column_lyric]);
                         song.setVol(vol);
-                        song.setStype(stype);
                         songs.add(song);
                     }
                     long time2 = System.currentTimeMillis();
-                    DatabaseHelper.getInstance().insertSongs(songs);
+                    DatabaseHelper.getInstance().insertSongs(songs, stype);
                     DatabaseHelper.getInstance().updateLinkVersion(dataLink);
 
                     Log.d("CSV read time:", (time2 - time) + " milliseconds");
                     Log.d("Database time:", (System.currentTimeMillis() - time2) + " milliseconds");
 
-                    sendBroadcast(new Intent(Constants.INTENT_GET_DATA_LINKS_COMPLETED));
+                    Intent fragmentIntent = new Intent(Constants.INTENT_GET_DATA_LINKS_COMPLETED);
+                    fragmentIntent.putExtra(Constants.VOL_LABEL, dataLink.getStype() + " - VOL " + dataLink.getVol());
+                    sendBroadcast(fragmentIntent);
+                    Thread.sleep(200);
+                    Log.d("Overall time:", (System.currentTimeMillis() - start) + " milliseconds");
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }

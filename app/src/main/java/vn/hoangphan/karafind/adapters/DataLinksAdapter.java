@@ -1,11 +1,13 @@
 package vn.hoangphan.karafind.adapters;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -15,16 +17,21 @@ import java.util.Set;
 
 import vn.hoangphan.karafind.R;
 import vn.hoangphan.karafind.models.DataLink;
+import vn.hoangphan.karafind.services.UpdateService;
 import vn.hoangphan.karafind.utils.CalendarUtils;
-import vn.hoangphan.karafind.utils.OnDataLinkSelected;
 
 /**
  * Created by Hoang Phan on 1/12/2016.
  */
 public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     private List<DataLink> mDataLinks = new ArrayList<>();
-    private Set<Integer> updatingPositions = new HashSet<>();
-    private static OnDataLinkSelected mOnDataLinkSelected = null;
+    private Set<Integer> mSelectedPositions = new HashSet<>();
+    private Set<Integer> mUpdatingPositions = new HashSet<>();
+    private Activity mActivity;
+
+    public DataLinksAdapter(Activity activity) {
+        mActivity = activity;
+    }
 
     @Override
     public DataLinkHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -35,31 +42,48 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     @Override
     public void onBindViewHolder(final DataLinkHolder holder, final int position) {
         final DataLink dataLink = mDataLinks.get(position);
-        holder.mTvVol.setText("VOL " + dataLink.getVol() + " - " + dataLink.getStype());
-        holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
-        if (dataLink.getVersion() != 0 && dataLink.getUpdatedAt() == dataLink.getVersion()) {
-            holder.mIvUpdate.setVisibility(View.GONE);
-            holder.mTvUpdating.setVisibility(View.GONE);
-            holder.mTvUpdated.setVisibility(View.VISIBLE);
-        } else if (updatingPositions.contains(position)) {
-            holder.mIvUpdate.setVisibility(View.GONE);
-            holder.mTvUpdating.setVisibility(View.VISIBLE);
-            holder.mTvUpdated.setVisibility(View.GONE);
+        holder.mTvVol.setText("VOL " + dataLink.getVol());
+        holder.mTvType.setText(dataLink.getStype());
+        if (mUpdatingPositions.contains(position)) {
+            holder.mCbSelect.setVisibility(View.INVISIBLE);
+            holder.mTvUpdatedAt.setText(R.string.updating);
         } else {
-            holder.mIvUpdate.setVisibility(View.VISIBLE);
-            holder.mTvUpdating.setVisibility(View.GONE);
-            holder.mTvUpdated.setVisibility(View.GONE);
-        }
-        holder.mIvUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOnDataLinkSelected != null) {
-                    mOnDataLinkSelected.update(dataLink);
+            holder.mCbSelect.setVisibility(View.VISIBLE);
+            holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
+            holder.mCbSelect.setChecked(mSelectedPositions.contains(position));
+            holder.mCbSelect.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mSelectedPositions.contains(position)) {
+                        mSelectedPositions.remove(position);
+                    } else {
+                        mSelectedPositions.add(position);
+                    }
+                    notifyDataSetChanged();
                 }
-                updatingPositions.add(position);
-                notifyDataSetChanged();
-            }
-        });
+            });
+        }
+    }
+
+    public void selectAll() {
+        for (int i = 0, size = mDataLinks.size(); i < size; i++) {
+            mSelectedPositions.add(i);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void unselectAll() {
+        mSelectedPositions.clear();
+        notifyDataSetChanged();
+    }
+
+    public void updateSelected() {
+        for (int position : mSelectedPositions) {
+            UpdateService.pushLink(mDataLinks.get(position));
+        }
+        mUpdatingPositions.addAll(mSelectedPositions);
+        notifyDataSetChanged();
+        mActivity.startService(new Intent(mActivity, UpdateService.class));
     }
 
     @Override
@@ -71,21 +95,16 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         mDataLinks = dataLinks;
     }
 
-    public void setOnDataLinkSelected(OnDataLinkSelected onDataLinkSelected) {
-        mOnDataLinkSelected = onDataLinkSelected;
-    }
-
     public static class DataLinkHolder extends ViewHolder {
-        TextView mTvVol, mTvUpdatedAt, mTvUpdating, mTvUpdated;
-        ImageView mIvUpdate;
+        TextView mTvVol, mTvUpdatedAt, mTvType;
+        CheckBox mCbSelect;
 
         public DataLinkHolder(View view) {
             super(view);
-            mTvVol = (TextView) view.findViewById(R.id.tv_vol_type);
+            mTvVol = (TextView) view.findViewById(R.id.tv_vol);
             mTvUpdatedAt = (TextView) view.findViewById(R.id.tv_updated_at);
-            mTvUpdating = (TextView) view.findViewById(R.id.tv_updating);
-            mTvUpdated = (TextView) view.findViewById(R.id.tv_updated);
-            mIvUpdate = (ImageView) view.findViewById(R.id.iv_update);
+            mTvType = (TextView) view.findViewById(R.id.tv_type);
+            mCbSelect = (CheckBox) view.findViewById(R.id.cb_select);
         }
     }
 }

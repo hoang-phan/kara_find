@@ -4,7 +4,7 @@
     <string name="update">Cập nhật</string>
     <string name="update_all">Cập nhật tất cả</string>
     <string name="updating">Đang cập nhật ...</string>
-    <string name="updated">Đã cập nhật</string>
+    <string name="updated">Cập nhật thành công %s!</string>
     <string name="name_author_or_lyric">Bài hát, tác giả hoặc lời ...</string>
     <string name="dismiss">Dismiss</string>
     <string name="settings">Cài đặt</string>
@@ -16,4 +16,6 @@
     <string name="language_vi">Có (OK)</string>
     <string name="language_other">Không (No, thanks)</string>
     <string name="language_title">Language</string>
+    <string name="select_all">Chọn tất cả</string>
+    <string name="unselect_all">Bỏ chọn tất cả</string>
 </resources>

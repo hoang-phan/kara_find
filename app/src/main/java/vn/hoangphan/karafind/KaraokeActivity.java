@@ -20,11 +20,10 @@ import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.services.GetLinkService;
 import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
-import vn.hoangphan.karafind.views.CustomTabLayout;
 import vn.hoangphan.karafind.views.NonSwipeableViewPager;
 
 public class KaraokeActivity extends ActionBarActivity {
-    CustomTabLayout mTabLayout;
+    TabLayout mTabLayout;
     NonSwipeableViewPager mPager;
     PagerAdapter mAdapter;
     Locale mLocale = null;
@@ -61,9 +60,7 @@ public class KaraokeActivity extends ActionBarActivity {
     private void initConfigurations() {
         DatabaseHelper.init(this);
         PreferenceUtils.init(this);
-        DatabaseHelper.getInstance().reset();
-        PreferenceUtils.getInstance().reset();
-
+        DatabaseHelper.getInstance().prepareFTSTables();
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
         if (!TextUtils.isEmpty(language)) {
@@ -107,7 +104,7 @@ public class KaraokeActivity extends ActionBarActivity {
 
     private void initComponents() {
         mAdapter = new PagerAdapter(getSupportFragmentManager());
-        mTabLayout = (CustomTabLayout)findViewById(R.id.tab_layout);
+        mTabLayout = (TabLayout)findViewById(R.id.tab_layout);
         mPager = (NonSwipeableViewPager)findViewById(R.id.viewPager);
     }
 

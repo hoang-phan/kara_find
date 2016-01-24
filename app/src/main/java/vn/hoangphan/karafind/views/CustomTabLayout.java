@@ -1,8 +1,10 @@
 package vn.hoangphan.karafind.views;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.support.design.widget.TabLayout;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -24,7 +26,15 @@ public class CustomTabLayout extends TabLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        super.setMeasuredDimension(widthMeasureSpec,
-                View.MeasureSpec.makeMeasureSpec(View.MeasureSpec.getSize(heightMeasureSpec), View.MeasureSpec.EXACTLY));
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
     }
 }
