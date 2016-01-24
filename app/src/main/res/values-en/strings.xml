@@ -4,6 +4,6 @@
     <string name="update">Update</string>
     <string name="update_all">Update all</string>
     <string name="updating">Updating ...</string>
-    <string name="updated">Updated</string>
+    <string name="updated">Successfully updated %s!</string>
     <string name="name_author_or_lyric">Name, Author or Lyric ...</string>
 </resources>

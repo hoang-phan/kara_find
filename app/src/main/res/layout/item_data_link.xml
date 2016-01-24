@@ -2,6 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/cb_select"
+        android:layout_gravity="center_vertical"/>
     <LinearLayout
         android:layout_width="0dp"
         android:layout_weight="1"
@@ -13,41 +18,21 @@
             fontPath="fonts/circle.ttf"
             android:textColor="@color/primary"
             android:textSize="@dimen/title_text_size"
-            android:id="@+id/tv_vol_type"/>
+            android:id="@+id/tv_vol"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/medium_text_size"
             android:textColor="@color/title"
-            android:id="@+id/tv_updated_at"/>
+            android:textSize="@dimen/secondary_text_size"
+            android:id="@+id/tv_type"/>
+
     </LinearLayout>
-    <FrameLayout
+    <TextView
         android:layout_width="wrap_content"
-        android:layout_height="match_parent">
-        <ImageView
-            android:layout_width="@dimen/large_image_size"
-            android:layout_height="@dimen/large_image_size"
-            android:layout_gravity="center_vertical"
-            android:layout_margin="@dimen/common_padding"
-            android:src="@drawable/ic_download"
-            android:id="@+id/iv_update" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/updating"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/tv_updating"
-            android:textColor="@color/title"
-            android:visibility="gone"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/updated"
-            android:layout_gravity="center_vertical"
-            android:id="@+id/tv_updated"
-            android:textColor="@color/title"
-            android:visibility="gone"
-            />
-    </FrameLayout>
+        android:layout_height="match_parent"
+        android:textSize="@dimen/medium_text_size"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:textColor="@color/title"
+        android:id="@+id/tv_updated_at"/>
 </LinearLayout>

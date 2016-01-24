@@ -13,6 +13,7 @@ import java.util.List;
 import vn.hoangphan.karafind.models.DataLink;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.DatabaseUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
 
@@ -21,10 +22,28 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "kara.db";
-    public static final String TABLE_SONGS = "songs";
     public static final String TABLE_DATA_LINKS = "data_links";
-    public static final String TABLE_FTS_LYRICS = "fts_lyrics";
-    public static final String TABLE_FTS_INFO = "fts_info";
+
+    public static final String TABLE_AR5 = "ar5";
+    public static final String TABLE_FTS_AR5_LYRICS = "fts_ar5_lyrics";
+    public static final String TABLE_FTS_AR5_INFO = "fts_ar5_info";
+
+    public static final String TABLE_CAL = "cal";
+    public static final String TABLE_FTS_CAL_LYRICS = "fts_cal_lyrics";
+    public static final String TABLE_FTS_CAL_INFO = "fts_cal_info";
+
+    public static final String TABLE_KTV = "ktv";
+    public static final String TABLE_FTS_KTV_LYRICS = "fts_ktv_lyrics";
+    public static final String TABLE_FTS_KTV_INFO = "fts_ktv_info";
+
+    public static final String TABLE_MSC = "msc";
+    public static final String TABLE_FTS_MSC_LYRICS = "fts_msc_lyrics";
+    public static final String TABLE_FTS_MSC_INFO = "fts_msc_info";
+
+    public static final String TABLE_ARE = "are";
+    public static final String TABLE_FTS_ARE_LYRICS = "fts_are_lyrics";
+    public static final String TABLE_FTS_ARE_INFO = "fts_are_info";
+
     public static final String COLUMN_FAVORITED = "favorited";
     public static final String COLUMN_UPDATED_AT = "updated_at";
     public static final String COLUMN_ID = "id";
@@ -42,17 +61,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final int VALUE_TRUE = 1;
 
-    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer default 0, %s text, %s text, %s text, %s text)";
-    public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
     public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer default 0, %s integer default 0, %s text)";
+
+    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer default 0, %s text, %s text, %s text)";
+    public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
 
     public static final String ADD_UNIQUE_INDEX_SQL = "CREATE UNIQUE INDEX `index_%2$s_%1$s` ON `%1$s` (`%2$s` ASC)";
     public static final String ADD_UNIQUE_INDEXES_SQL = "CREATE UNIQUE INDEX `index_%2$s_%3$s_%1$s` ON `%1$s` (`%2$s`, `%3$s`)";
-    public static final String ADD_INDEXES_SQL = "CREATE INDEX `index_%2$s_%3$s_%1$s` ON `%1$s` (`%2$s`, `%3$s`)";
+    public static final String ADD_INDEX_SQL = "CREATE INDEX `index_%2$s_%1$s` ON `%1$s` (`%2$s` ASC)";
     public static final String DROP_TABLE_SQL = "DROP TABLE IF EXISTS %s";
-    public static final String DROP_INDEX_SQL = "DROP INDEX IF EXISTS `index_%s_%s`";
+    public static final String DROP_INDEX_SQL = "DROP INDEX IF EXISTS `index_%2$s_%1$s`";
+    public static final String DROP_INDEXES_SQL = "DROP INDEX IF EXISTS `index_%2$s_%3$s_%1$s`";
 
-    public static final String SELECT_FTS = "SELECT docid, HEX(MATCHINFO(%1$s, 's')) AS rank, LENGTH(%2$s) AS len FROM %1$s WHERE %1$s MATCH ? AND docid IN (SELECT %4$s FROM %3$s WHERE %5$s = ?)";
+    public static final String SELECT_FTS = "SELECT docid, HEX(MATCHINFO(%1$s, 's')) AS rank, LENGTH(%2$s) AS len FROM %1$s WHERE %1$s MATCH ?";
 
     private static DatabaseHelper instance = null;
 
@@ -70,13 +91,45 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_SONGS, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR, COLUMN_STYPE));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_AR5, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_CAL, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_MSC, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_KTV, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR));
+        db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, TABLE_ARE, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR));
+
         db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_VERSION, COLUMN_STYPE));
-        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_LYRICS, COLUMN_UTF));
-        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_INFO, COLUMN_INFO_UTF));
-        db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, TABLE_SONGS, COLUMN_SONG_ID));
-        db.execSQL(String.format(ADD_INDEXES_SQL, TABLE_SONGS, COLUMN_VOL, COLUMN_STYPE));
+
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_AR5_LYRICS, COLUMN_UTF));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_AR5_INFO, COLUMN_INFO_UTF));
+
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_CAL_LYRICS, COLUMN_UTF));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_CAL_INFO, COLUMN_INFO_UTF));
+
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_KTV_LYRICS, COLUMN_UTF));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_KTV_INFO, COLUMN_INFO_UTF));
+
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_MSC_LYRICS, COLUMN_UTF));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_MSC_INFO, COLUMN_INFO_UTF));
+
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_ARE_LYRICS, COLUMN_UTF));
+        db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, TABLE_FTS_ARE_INFO, COLUMN_INFO_UTF));
+
         db.execSQL(String.format(ADD_UNIQUE_INDEXES_SQL, TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_STYPE));
+
+        db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, TABLE_AR5, COLUMN_SONG_ID));
+        db.execSQL(String.format(ADD_INDEX_SQL, TABLE_AR5, COLUMN_VOL));
+
+        db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, TABLE_CAL, COLUMN_SONG_ID));
+        db.execSQL(String.format(ADD_INDEX_SQL, TABLE_CAL, COLUMN_VOL));
+
+        db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, TABLE_MSC, COLUMN_SONG_ID));
+        db.execSQL(String.format(ADD_INDEX_SQL, TABLE_MSC, COLUMN_VOL));
+
+        db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, TABLE_KTV, COLUMN_SONG_ID));
+        db.execSQL(String.format(ADD_INDEX_SQL, TABLE_KTV, COLUMN_VOL));
+
+        db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, TABLE_ARE, COLUMN_SONG_ID));
+        db.execSQL(String.format(ADD_INDEX_SQL, TABLE_ARE, COLUMN_VOL));
     }
 
     @Override
@@ -93,8 +146,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         reset(getWritableDatabase());
     }
 
-    public boolean insertSongs(List<Song> songs) {
-        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s, %9$s, %10$s, %11$s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT %11$s FROM %1$s WHERE %2$s = ? LIMIT 1));", TABLE_SONGS, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR, COLUMN_STYPE, COLUMN_FAVORITED);
+    public boolean insertSongs(List<Song> songs, String type) {
+        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s, %9$s, %10$s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT %10$s FROM %1$s WHERE %2$s = ? LIMIT 1));", DatabaseUtils.getTableName(type), COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR, COLUMN_FAVORITED);
         SQLiteDatabase db = getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(insertSql);
         db.beginTransaction();
@@ -108,8 +161,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             statement.bindString(6, LanguageUtils.translateToUtf(song.getLyric()));
             statement.bindString(7, LanguageUtils.translateToUtf(song.getName() + " " + song.getAuthor() + " " + song.getId()));
             statement.bindString(8, LanguageUtils.translateToUtf(LanguageUtils.getFirstLetters(song.getName())));
-            statement.bindString(9, song.getStype());
-            statement.bindString(10, song.getId());
+            statement.bindString(9, song.getId());
             statement.execute();
         }
         db.setTransactionSuccessful();
@@ -145,16 +197,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean updateFavorite(Song song) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ?", TABLE_SONGS, COLUMN_FAVORITED, COLUMN_SONG_ID), new String[] { song.isFavorited() ? "1" : "0", song.getId() });
+        int type = (int)PreferenceUtils.getInstance().getConfigLong(Constants.TYPE);
+        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ?", DatabaseUtils.getTableName(type), COLUMN_FAVORITED, COLUMN_SONG_ID), new String[] { song.isFavorited() ? "1" : "0", song.getId() });
         return true;
     }
 
     public boolean prepareFTSTables() {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_FTS_LYRICS, null, null);
-        db.delete(TABLE_FTS_INFO, null, null);
-        db.execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", TABLE_FTS_LYRICS, COLUMN_UTF, COLUMN_ID, TABLE_SONGS));
-        db.execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", TABLE_FTS_INFO, COLUMN_INFO_UTF, COLUMN_ID, TABLE_SONGS));
+        for (String type : Constants.ALL_TYPES) {
+            String tableLyrics = DatabaseUtils.getTableFTSLyricName(type);
+            String tableInfo = DatabaseUtils.getTableFTSInfoName(type);
+            String tableName = DatabaseUtils.getTableName(type);
+            db.delete(tableLyrics, null, null);
+            db.delete(tableInfo, null, null);
+            db.execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", tableLyrics, COLUMN_UTF, COLUMN_ID, tableName));
+            db.execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", tableInfo, COLUMN_INFO_UTF, COLUMN_ID, tableName));
+        }
+
         return true;
     }
 
@@ -163,11 +222,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ArrayList<Song> songs = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
-        String matchLyricSql = String.format(SELECT_FTS, TABLE_FTS_LYRICS, COLUMN_UTF, TABLE_SONGS, COLUMN_ID, COLUMN_STYPE);
-        String matchSongSql = String.format(SELECT_FTS, TABLE_FTS_INFO, COLUMN_INFO_UTF, TABLE_SONGS, COLUMN_ID, COLUMN_STYPE);
 
-        int type = (int)PreferenceUtils.getInstance().getConfigLong(Constants.TYPE);
-        Cursor res = db.rawQuery(String.format("SELECT %1$s.* FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%2$s UNION ALL %3$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC", TABLE_SONGS, matchLyricSql, matchSongSql, COLUMN_ID), new String[]{filter, Constants.ALL_TYPES[type], filter, Constants.ALL_TYPES[type] });
+        int type = getCurrentType();
+        String matchLyricSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF);
+        String matchSongSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF);
+
+        Cursor res = db.rawQuery(String.format("SELECT %1$s.* FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%2$s UNION ALL %3$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_ID), new String[]{ filter, filter });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
@@ -186,8 +246,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getReadableDatabase();
 
-        int type = (int)PreferenceUtils.getInstance().getConfigLong(Constants.TYPE);
-        Cursor res = db.rawQuery(String.format("SELECT * FROM %1$s WHERE %2$s LIKE ? AND stype = ? ORDER BY LENGTH(%2$s) LIMIT 20", TABLE_SONGS, COLUMN_ABBR), new String[] { filter + "%", Constants.ALL_TYPES[type] });
+        Cursor res = db.rawQuery(String.format("SELECT * FROM %1$s WHERE %2$s LIKE ? ORDER BY LENGTH(%2$s) LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_ABBR), new String[] { filter + "%" });
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
@@ -206,8 +265,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getReadableDatabase();
 
-        int type = (int)PreferenceUtils.getInstance().getConfigLong(Constants.TYPE);
-        Cursor res = db.rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s WHERE stype = ? ORDER BY %2$s LIMIT 40", TABLE_SONGS, COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), new String[] { Constants.ALL_TYPES[type] });
+        Cursor res = db.rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s ORDER BY %2$s LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), null);
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
@@ -219,7 +277,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return songs;
     }
 
-    public List<DataLink> allDataLinks() {
+    public List<DataLink> nonUpdatedDataLinks() {
         ArrayList<DataLink> dataLinks = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
@@ -227,7 +285,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
-            dataLinks.add(getDataLink(res));
+            DataLink dataLink = getDataLink(res);
+            if (dataLink.getUpdatedAt() > dataLink.getVersion()) {
+                dataLinks.add(dataLink);
+            }
             res.moveToNext();
         }
 
@@ -236,14 +297,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void dropDb(SQLiteDatabase db) {
         long current = System.currentTimeMillis();
-        db.execSQL(String.format(DROP_INDEX_SQL, COLUMN_SONG_ID, TABLE_SONGS));
-        db.execSQL(String.format(DROP_INDEX_SQL, COLUMN_VOL, TABLE_SONGS));
-        db.execSQL(String.format(DROP_INDEX_SQL, COLUMN_STYPE, TABLE_SONGS));
-        db.execSQL(String.format(DROP_INDEX_SQL, COLUMN_VOL, TABLE_DATA_LINKS));
-        db.execSQL(String.format(DROP_INDEX_SQL, COLUMN_STYPE, TABLE_DATA_LINKS));
-        db.execSQL(String.format(DROP_TABLE_SQL, TABLE_FTS_LYRICS));
-        db.execSQL(String.format(DROP_TABLE_SQL, TABLE_FTS_INFO));
-        db.execSQL(String.format(DROP_TABLE_SQL, TABLE_SONGS));
+
+        for (String type : Constants.ALL_TYPES) {
+            String tableLyrics = DatabaseUtils.getTableFTSLyricName(type);
+            String tableInfo = DatabaseUtils.getTableFTSInfoName(type);
+            String tableName = DatabaseUtils.getTableName(type);
+
+            db.execSQL(String.format(DROP_INDEX_SQL, tableName, COLUMN_SONG_ID));
+            db.execSQL(String.format(DROP_INDEXES_SQL, tableName, COLUMN_VOL, COLUMN_STYPE));
+            db.execSQL(String.format(DROP_TABLE_SQL, tableLyrics));
+            db.execSQL(String.format(DROP_TABLE_SQL, tableInfo));
+            db.execSQL(String.format(DROP_TABLE_SQL, tableName));
+        }
+
+        db.execSQL(String.format(DROP_INDEXES_SQL, TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_STYPE));
         db.execSQL(String.format(DROP_TABLE_SQL, TABLE_DATA_LINKS));
         Log.d("Drop DB time", (System.currentTimeMillis() - current) + " milliseconds");
     }
@@ -267,5 +334,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dataLink.setStype(res.getString(res.getColumnIndex(COLUMN_STYPE)));
         dataLink.setVersion(res.getInt(res.getColumnIndex(COLUMN_VERSION)));
         return dataLink;
+    }
+
+    private int getCurrentType() {
+        return (int)PreferenceUtils.getInstance().getConfigLong(Constants.TYPE);
     }
 }
