@@ -19,6 +19,7 @@ import vn.hoangphan.karafind.adapters.PagerAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.services.GetLinkService;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
 import vn.hoangphan.karafind.views.NonSwipeableViewPager;
 
@@ -41,7 +42,7 @@ public class KaraokeActivity extends ActionBarActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        changeLanguage(newConfig);
+        LanguageUtils.getInstance().changeLanguage(mLocale, newConfig);
     }
 
     @Override
@@ -49,22 +50,16 @@ public class KaraokeActivity extends ActionBarActivity {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
     }
 
-    private void changeLanguage(Configuration newConfig) {
-        if (mLocale != null) {
-            newConfig.locale = mLocale;
-            Locale.setDefault(mLocale);
-            getBaseContext().getResources().updateConfiguration(newConfig, getBaseContext().getResources().getDisplayMetrics());
-        }
-    }
-
     private void initConfigurations() {
         DatabaseHelper.init(this);
         PreferenceUtils.init(this);
+        LanguageUtils.init(this);
+
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
         if (!TextUtils.isEmpty(language)) {
             mLocale = new Locale(language);
-            changeLanguage(getBaseContext().getResources().getConfiguration());
+            LanguageUtils.getInstance().changeLanguage(mLocale);
             proceed();
             return;
         }
@@ -78,7 +73,7 @@ public class KaraokeActivity extends ActionBarActivity {
                 public void onClick(DialogInterface dialog, int which) {
                     mLocale = new Locale("vi");
                     PreferenceUtils.getInstance().saveConfig(Constants.PREFERRED_LANGUAGE, "vi");
-                    changeLanguage(getBaseContext().getResources().getConfiguration());
+                    LanguageUtils.getInstance().changeLanguage(mLocale);
                     proceed();
                 }
             });

@@ -23,6 +23,7 @@ import vn.hoangphan.karafind.R;
 import vn.hoangphan.karafind.adapters.DataLinksAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.PreferenceUtils;
 
 /**
  * Created by Hoang Phan on 1/12/2016.
@@ -79,6 +80,9 @@ public class UpdateFragment extends Fragment {
             }
         });
         mCbSelectAll.setChecked(true);
+        if (PreferenceUtils.getInstance().getConfigLong(Constants.AUTO_UPDATE) == 1) {
+            mAdapter.updateSelected();
+        }
     }
 
     @Override
@@ -97,6 +101,9 @@ public class UpdateFragment extends Fragment {
                 } else {
                     mCbSelectAll.setChecked(false);
                     mCbSelectAll.setChecked(true);
+                    if (PreferenceUtils.getInstance().getConfigLong(Constants.AUTO_UPDATE) == 1) {
+                        mAdapter.updateSelected();
+                    }
                 }
                 mAdapter.notifyDataSetChanged();
                 checkLinksCount();
