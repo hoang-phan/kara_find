@@ -50,7 +50,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         } else {
             holder.mCbSelect.setVisibility(View.VISIBLE);
             holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
-            holder.mCbSelect.setChecked(mSelectedLinks.contains(position));
+            holder.mCbSelect.setChecked(mSelectedLinks.contains(dataLink));
             holder.mCbSelect.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -3,7 +3,7 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">#eea7cb</item>
-        <item name="colorAccent">@color/color_accent</item>
+        <item name="colorAccent">@color/title</item>
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
@@ -15,7 +15,7 @@
     </style>
 
     <style name="CustomTabText" parent="TextAppearance.AppCompat.Button">
-        <item name="android:textSize">@dimen/song_author_text_size</item>
+        <item name="android:textSize">@dimen/small_text_size</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@android:color/white</item>
     </style>

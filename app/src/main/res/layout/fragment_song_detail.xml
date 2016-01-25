@@ -2,39 +2,62 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorAccent">
+    android:background="@drawable/background">
     <LinearLayout
         android:orientation="vertical" android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/common_padding">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="@dimen/common_image_size"
+                android:layout_height="@dimen/common_image_size"
+                android:id="@+id/iv_favorite_detail"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/common_padding"
+                android:textColor="@color/white"
+                android:textSize="@dimen/title_text_size"
+                android:id="@+id/tv_song_id_detail"/>
+        </LinearLayout>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/medium_text_size"
-            android:id="@+id/tv_song_id_detail"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/song_name_text_size"
+            android:textSize="@dimen/large_text_size"
+            android:textColor="@color/white"
             android:textStyle="bold"
             android:id="@+id/tv_song_name_detail"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:textSize="@dimen/song_author_text_size"
+            android:textSize="@dimen/small_text_size"
+            android:textColor="@color/white"
             android:textStyle="italic"
             android:id="@+id/tv_song_author_detail"/>
         <TextView
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/medium_text_size"
+            android:textColor="@color/white"
+            android:gravity="center"
+            fontPath="fonts/dalat.ttf"
+            android:textSize="@dimen/large_text_size"
             android:id="@+id/tv_song_lyric_detail"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
+            android:background="@null"
+            android:textColor="@color/white"
             android:id="@+id/btn_dismiss"
             android:text="@string/dismiss"/>
     </LinearLayout>

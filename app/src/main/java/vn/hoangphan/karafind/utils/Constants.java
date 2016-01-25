@@ -29,5 +29,6 @@ public interface Constants {
     String SONG_NAME = "song_name";
     String SONG_AUTHOR = "song_author";
     String SONG_LYRIC = "song_lyric";
+    String SONG_FAVORITE = "song_favorite";
     String AUTO_UPDATE = "auto_update";
 }

@@ -76,13 +76,20 @@ public class UpdateFragment extends Fragment {
         mBtnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAdapter.updateSelected();
+                startUpdating();
             }
         });
+        mCbSelectAll.setChecked(false);
         mCbSelectAll.setChecked(true);
         if (PreferenceUtils.getInstance().getConfigLong(Constants.AUTO_UPDATE) == 1) {
-            mAdapter.updateSelected();
+            startUpdating();
         }
+    }
+
+    private void startUpdating() {
+        mCbSelectAll.setVisibility(View.GONE);
+        mTvSelectAll.setText(R.string.updating);
+        mAdapter.updateSelected();
     }
 
     @Override
