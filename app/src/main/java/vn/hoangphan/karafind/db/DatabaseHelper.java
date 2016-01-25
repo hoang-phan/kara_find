@@ -101,6 +101,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, tableInfo, COLUMN_INFO_UTF));
             db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, tableName, COLUMN_SONG_ID));
             db.execSQL(String.format(ADD_INDEX_SQL, tableName, COLUMN_VOL));
+            db.execSQL(String.format(ADD_INDEX_SQL, tableName, COLUMN_NAME));
+            db.execSQL(String.format(ADD_INDEX_SQL, tableName, COLUMN_ABBR));
         }
 
         db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_VERSION, COLUMN_STYPE));
@@ -197,12 +199,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String matchLyricSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF, "0");
         String matchSongSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF, "1");
 
-        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %1$s.* FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%3$s UNION ALL %2$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_ID), new String[]{ filter, filter });
+        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %1$s.%5$s, %1$s.%6$s, %1$s.%7$s, %1$s.%8$s, %1$s.%9$s, %1$s.%10$s FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%3$s UNION ALL %2$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_ID, COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), new String[]{ filter, filter });
         return getSongs(res);
     }
 
     public List<Song> getSongsWithFirstLetters(String filter) {
-        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT * FROM %1$s WHERE %2$s LIKE ? ORDER BY LENGTH(%2$s) LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_ABBR), new String[] { filter + "%" });
+        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s WHERE %8$s LIKE ? ORDER BY LENGTH(%8$s) LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_ABBR), new String[] { filter + "%" });
         return getSongs(res);
     }
 
@@ -256,7 +258,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String tableName = DatabaseUtils.getTableName(type);
 
             db.execSQL(String.format(DROP_INDEX_SQL, tableName, COLUMN_SONG_ID));
-            db.execSQL(String.format(DROP_INDEXES_SQL, tableName, COLUMN_VOL, COLUMN_STYPE));
+            db.execSQL(String.format(DROP_INDEX_SQL, tableName, COLUMN_NAME));
+            db.execSQL(String.format(DROP_INDEX_SQL, tableName, COLUMN_VOL));
+            db.execSQL(String.format(DROP_INDEX_SQL, tableName, COLUMN_ABBR));
             db.execSQL(String.format(DROP_TABLE_SQL, tableLyrics));
             db.execSQL(String.format(DROP_TABLE_SQL, tableInfo));
             db.execSQL(String.format(DROP_TABLE_SQL, tableName));
