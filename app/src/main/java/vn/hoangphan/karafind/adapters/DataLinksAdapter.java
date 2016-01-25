@@ -25,7 +25,7 @@ import vn.hoangphan.karafind.utils.CalendarUtils;
  */
 public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     private List<DataLink> mDataLinks = new ArrayList<>();
-    private Set<Integer> mSelectedPositions = new HashSet<>();
+    private Set<DataLink> mSelectedLinks = new HashSet<>();
     private Set<DataLink> mUpdatingLinks = new HashSet<>();
     private Activity mActivity;
 
@@ -50,14 +50,14 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         } else {
             holder.mCbSelect.setVisibility(View.VISIBLE);
             holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
-            holder.mCbSelect.setChecked(mSelectedPositions.contains(position));
+            holder.mCbSelect.setChecked(mSelectedLinks.contains(position));
             holder.mCbSelect.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mSelectedPositions.contains(position)) {
-                        mSelectedPositions.remove(position);
+                    if (mSelectedLinks.contains(dataLink)) {
+                        mSelectedLinks.remove(dataLink);
                     } else {
-                        mSelectedPositions.add(position);
+                        mSelectedLinks.add(dataLink);
                     }
                     notifyDataSetChanged();
                 }
@@ -66,24 +66,22 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     }
 
     public void selectAll() {
-        for (int i = 0, size = mDataLinks.size(); i < size; i++) {
-            mSelectedPositions.add(i);
-        }
+        mSelectedLinks.clear();
+        mSelectedLinks.addAll(mDataLinks);
         notifyDataSetChanged();
     }
 
     public void unselectAll() {
-        mSelectedPositions.clear();
+        mSelectedLinks.clear();
         notifyDataSetChanged();
     }
 
     public void updateSelected() {
-        for (int position : mSelectedPositions) {
-            DataLink link = mDataLinks.get(position);
-            UpdateService.pushLink(link);
-            mUpdatingLinks.add(link);
+        for (DataLink dataLink : mSelectedLinks) {
+            UpdateService.pushLink(dataLink);
+            mUpdatingLinks.add(dataLink);
         }
-        mSelectedPositions.clear();
+        mSelectedLinks.clear();
         notifyDataSetChanged();
         mActivity.startService(new Intent(mActivity, UpdateService.class));
     }
