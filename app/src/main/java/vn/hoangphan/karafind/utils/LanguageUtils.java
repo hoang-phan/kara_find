@@ -10,11 +10,11 @@ public class LanguageUtils {
     public static String translateToUtf(String unicode) {
         String temp = Normalizer.normalize(unicode, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
-        return pattern.matcher(temp).replaceAll("").toUpperCase().replaceAll("Đ", "D");
+        return pattern.matcher(temp).replaceAll("").toUpperCase().replaceAll("[ĐÐ]", "D");
     }
 
     public static String getFirstLetters(String src) {
-        String[] words = src.split("[ ,.?!:]+");
+        String[] words = src.split("[ ,.?!:\\-+()*]+");
         String result = "";
         for (String word : words) {
             result += word.charAt(0);

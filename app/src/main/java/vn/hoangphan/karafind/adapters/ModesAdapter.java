@@ -14,7 +14,7 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
  * Created by Hoang Phan on 1/20/2016.
  */
 public class ModesAdapter extends BaseAdapter {
-    public static final String[] ALL_MODES = { "Tìm tất cả", "Tìm tên viết tắt" };
+    public static final int[] ALL_MODES = { R.string.find_all, R.string.find_by_abbr };
 
     @Override
     public int getCount() {
@@ -22,7 +22,7 @@ public class ModesAdapter extends BaseAdapter {
     }
 
     @Override
-    public String getItem(int position) {
+    public Integer getItem(int position) {
         return ALL_MODES[position];
     }
 

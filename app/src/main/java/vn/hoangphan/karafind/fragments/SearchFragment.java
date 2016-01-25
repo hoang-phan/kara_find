@@ -45,33 +45,54 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
 /**
  * Created by Hoang Phan on 1/12/2016.
  */
-public class SearchFragment extends Fragment {
+public class SearchFragment extends BaseSongsFragment {
     private static final int REQUEST_CODE = 1234;
 
     private EditText mEtSearch;
-    private RecyclerView mRvSongs;
     private ImageView mIcSearch;
     private ImageView mIcAdvance;
-    private SongsAdapter mSongAdapter;
     private ModesAdapter mModesAdapter;
     private TypesAdapter mTypesAdapter;
     private PopupWindow mPopupSearch;
     private ListView mLvModes;
     private ListView mLvTypes;
-    private LayoutInflater mInflater;
-    private BroadcastReceiver mReceiver;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
-        mRvSongs = (RecyclerView)view.findViewById(R.id.rv_songs);
-        mEtSearch = (EditText) view.findViewById(R.id.et_search);
-        mIcSearch = (ImageView)view.findViewById(R.id.ic_search);
-        mIcAdvance = (ImageView)view.findViewById(R.id.ic_advance);
-        mSongAdapter = new SongsAdapter(getActivity());
-        mInflater = inflater;
+    protected void populateData() {
+        String filter = mEtSearch.getText().toString();
+        if (TextUtils.isEmpty(filter)){
+            mSongAdapter.setSongs(DatabaseHelper.getInstance().allSongs());
+        } else {
+            String transformed = LanguageUtils.translateToUtf(filter);
+            switch ((int)PreferenceUtils.getInstance().getConfigLong(Constants.MODE)) {
+                case Constants.MODE_FREE:
+                    mSongAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(transformed));
+                    break;
+                case Constants.MODE_ABBR:
+                    mSongAdapter.setSongs(DatabaseHelper.getInstance().getSongsWithFirstLetters(transformed));
+                    break;
+            }
+        }
+        mSongAdapter.notifyDataSetChanged();
+    }
 
-        View advancePopupView = mInflater.inflate(R.layout.popup_advance, null);
+    @Override
+    protected String intentIdentifier() {
+        return Constants.INTENT_UPDATED_COMPLETED;
+    }
+
+    @Override
+    protected int layoutRes() {
+        return R.layout.fragment_search;
+    }
+
+    @Override
+    protected void extraInit(View view, LayoutInflater inflater) {
+        mEtSearch = (EditText) view.findViewById(R.id.et_search);
+        mIcSearch = (ImageView) view.findViewById(R.id.ic_search);
+        mIcAdvance = (ImageView) view.findViewById(R.id.ic_advance);
+
+        View advancePopupView = inflater.inflate(R.layout.popup_advance, null);
         mLvModes = (ListView)advancePopupView.findViewById(R.id.lv_modes);
         mLvTypes = (ListView)advancePopupView.findViewById(R.id.lv_types);
         mModesAdapter = new ModesAdapter();
@@ -83,7 +104,12 @@ public class SearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PreferenceUtils.getInstance().saveConfig(Constants.MODE, position);
                 mModesAdapter.notifyDataSetChanged();
-                filterSongs();
+                if (position == 0) {
+                    mEtSearch.setHint(R.string.name_author_or_lyric);
+                } else {
+                    mEtSearch.setHint(R.string.abbreviate);
+                }
+                populateData();
             }
         });
         mLvTypes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -91,18 +117,14 @@ public class SearchFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 PreferenceUtils.getInstance().saveConfig(Constants.TYPE, position);
                 mTypesAdapter.notifyDataSetChanged();
-                filterSongs();
+                populateData();
             }
         });
         mPopupSearch = new PopupWindow(advancePopupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        return view;
     }
 
     @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mRvSongs.setAdapter(mSongAdapter);
-        mRvSongs.setLayoutManager(new LinearLayoutManager(getActivity()));
+    protected void extraPopulate(View view) {
         mIcSearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,46 +149,13 @@ public class SearchFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                filterSongs();
-            }
-        });
-
-        mSongAdapter.setOnSongDetailClick(new OnSongDetailClick() {
-            @Override
-            public void view(Song song) {
-                SongDetailsFragment songDetailsFragment = new SongDetailsFragment();
-                Bundle args = new Bundle();
-                args.putString(Constants.SONG_ID, song.getId());
-                args.putString(Constants.SONG_NAME, song.getName());
-                args.putString(Constants.SONG_LYRIC, song.getLyric());
-                args.putString(Constants.SONG_AUTHOR, song.getAuthor());
-                songDetailsFragment.setArguments(args);
-
-                getActivity().getSupportFragmentManager().beginTransaction().add(R.id.frame_main, songDetailsFragment).commit();
+                populateData();
             }
         });
 
         PackageManager packageManager = getActivity().getPackageManager();
         List<ResolveInfo> infos = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
         mIcSearch.setEnabled(infos.size() > 0);
-        filterSongs();
-    }
-
-    private void filterSongs() {
-        String filter = LanguageUtils.translateToUtf(mEtSearch.getText().toString());
-        if (TextUtils.isEmpty(filter)){
-            mSongAdapter.setSongs(DatabaseHelper.getInstance().allSongs());
-        } else {
-            switch ((int)PreferenceUtils.getInstance().getConfigLong(Constants.MODE)) {
-                case Constants.MODE_FREE:
-                    mSongAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(filter));
-                    break;
-                case Constants.MODE_ABBR:
-                    mSongAdapter.setSongs(DatabaseHelper.getInstance().getSongsWithFirstLetters(filter));
-                    break;
-            }
-        }
-        mSongAdapter.notifyDataSetChanged();
     }
 
     private void togglePopupSearch() {
@@ -205,25 +194,5 @@ public class SearchFragment extends Fragment {
             mPopupSearch.dismiss();
         }
         super.onDestroy();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        IntentFilter intentFilter = new IntentFilter(Constants.INTENT_UPDATED_COMPLETED);
-        mReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                filterSongs();
-            }
-        };
-
-        getActivity().registerReceiver(mReceiver, intentFilter);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        getActivity().unregisterReceiver(mReceiver);
     }
 }
