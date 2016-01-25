@@ -173,9 +173,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean updateFavorite(Song song) {
+        return updateFavorite(song.getId(), song.isFavorited());
+    }
+
+    public boolean updateFavorite(String songId, boolean isFavorited) {
         SQLiteDatabase db = getWritableDatabase();
         int type = (int)PreferenceUtils.getInstance().getConfigLong(Constants.TYPE);
-        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ?", DatabaseUtils.getTableName(type), COLUMN_FAVORITED, COLUMN_SONG_ID), new String[] { song.isFavorited() ? "1" : "0", song.getId() });
+        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ?", DatabaseUtils.getTableName(type), COLUMN_FAVORITED, COLUMN_SONG_ID), new String[] { isFavorited ? "1" : "0", songId });
         return true;
     }
 

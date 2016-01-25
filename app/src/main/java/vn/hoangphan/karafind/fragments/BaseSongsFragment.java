@@ -50,6 +50,7 @@ public abstract class BaseSongsFragment extends Fragment {
                 args.putString(Constants.SONG_NAME, song.getName());
                 args.putString(Constants.SONG_LYRIC, song.getLyric());
                 args.putString(Constants.SONG_AUTHOR, song.getAuthor());
+                args.putInt(Constants.SONG_FAVORITE, song.isFavorited() ? 1 : 0);
                 songDetailsFragment.setArguments(args);
 
                 getActivity().getSupportFragmentManager().beginTransaction().add(R.id.frame_main, songDetailsFragment).commit();

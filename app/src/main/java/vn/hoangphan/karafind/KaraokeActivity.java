@@ -6,17 +6,20 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 
+import java.util.List;
 import java.util.Locale;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 import vn.hoangphan.karafind.adapters.PagerAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
+import vn.hoangphan.karafind.fragments.SongDetailsFragment;
 import vn.hoangphan.karafind.services.GetLinkService;
 import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.LanguageUtils;
@@ -54,6 +57,8 @@ public class KaraokeActivity extends ActionBarActivity {
         DatabaseHelper.init(this);
         PreferenceUtils.init(this);
         LanguageUtils.init(this);
+
+        PreferenceUtils.getInstance().reset();
 
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
@@ -132,5 +137,17 @@ public class KaraokeActivity extends ActionBarActivity {
         if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT))) {
             startService(new Intent(this, GetLinkService.class));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        for (Fragment fragment : fragments) {
+            if (fragment instanceof SongDetailsFragment) {
+                getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+                return;
+            }
+        }
+        super.onBackPressed();
     }
 }

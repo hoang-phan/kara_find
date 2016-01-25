@@ -57,7 +57,7 @@
                 android:ellipsize="end"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/song_author_text_size"
+                android:textSize="@dimen/small_text_size"
                 android:textStyle="italic"
                 android:textColor="@color/primary"
                 android:text="Author"
