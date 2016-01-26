@@ -31,4 +31,5 @@ public interface Constants {
     String SONG_LYRIC = "song_lyric";
     String SONG_FAVORITE = "song_favorite";
     String AUTO_UPDATE = "auto_update";
+    String ENCRYPTED_KEY = "encrypted_key";
 }
