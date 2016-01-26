@@ -78,4 +78,18 @@ public class Song {
     public void setStype(String stype) {
         this.stype = stype;
     }
+
+    @Override
+    public String toString() {
+        return "Song{" +
+                "name='" + name + '\'' +
+                ", lyric='" + lyric + '\'' +
+                ", author='" + author + '\'' +
+                ", id='" + id + '\'' +
+                ", utf='" + utf + '\'' +
+                ", stype='" + stype + '\'' +
+                ", favorited=" + favorited +
+                ", vol=" + vol +
+                '}';
+    }
 }

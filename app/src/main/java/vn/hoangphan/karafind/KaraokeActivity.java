@@ -58,8 +58,6 @@ public class KaraokeActivity extends ActionBarActivity {
         PreferenceUtils.init(this);
         LanguageUtils.init(this);
 
-        PreferenceUtils.getInstance().reset();
-
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
         if (!TextUtils.isEmpty(language)) {
@@ -132,7 +130,7 @@ public class KaraokeActivity extends ActionBarActivity {
             }
         });
         mPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mPager.setOffscreenPageLimit(3);
+        mPager.setOffscreenPageLimit(4);
 
         if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT))) {
             startService(new Intent(this, GetLinkService.class));

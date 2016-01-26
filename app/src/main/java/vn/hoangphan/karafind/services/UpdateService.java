@@ -4,7 +4,14 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.FileHeader;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
@@ -45,16 +52,20 @@ public class UpdateService extends IntentService {
             long start = System.currentTimeMillis();
             dataLink = mLinks.remove();
 
-            String link = dataLink.getLink();
             int vol = dataLink.getVol();
-            String stype = dataLink.getStype();
-
             if (vol >= 0) {
                 try {
+                    String link = dataLink.getLink();
+                    String stype = dataLink.getStype();
                     long time = System.currentTimeMillis();
                     URL url = new URL(link);
 
-                    CSVReader reader = new CSVReader(new InputStreamReader(url.openStream()));
+                    ZipFile zipFile = new ZipFile(createTempFile(url));
+                    zipFile.setPassword(dataLink.getDecryptedPassword());
+                    List<Object> fileHeaderList = zipFile.getFileHeaders();
+                    InputStream is = zipFile.getInputStream((FileHeader) fileHeaderList.get(0));
+
+                    CSVReader reader = new CSVReader(new InputStreamReader(is));
                     List<String> headers = Arrays.asList(reader.readNext());
 
                     int column_id = headers.indexOf("id"),
@@ -74,6 +85,9 @@ public class UpdateService extends IntentService {
                         song.setVol(vol);
                         songs.add(song);
                     }
+
+                    reader.close();
+
                     long time2 = System.currentTimeMillis();
                     DatabaseHelper.getInstance().insertSongs(songs, stype);
                     DatabaseHelper.getInstance().updateLinkVersion(dataLink);
@@ -90,6 +104,8 @@ public class UpdateService extends IntentService {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                } catch (ZipException e) {
+                    e.printStackTrace();
                 }
             }
             DatabaseHelper.getInstance().prepareFTSTables();
@@ -97,5 +113,22 @@ public class UpdateService extends IntentService {
 
             mIsRunning = false;
         }
+    }
+
+    private File createTempFile(URL url) throws IOException {
+        File tempFile = File.createTempFile("temp", ".zip");
+        tempFile.deleteOnExit();
+
+        FileOutputStream fout = new FileOutputStream(tempFile);
+        InputStream is = url.openStream();
+
+        byte[] buf = new byte[1024];
+        int len;
+        while ((len = is.read(buf)) != -1) {
+            fout.write(buf, 0, len);
+        }
+
+        fout.close();
+        return tempFile;
     }
 }

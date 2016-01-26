@@ -58,10 +58,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_VERSION = "version";
     public static final String COLUMN_INFO_UTF = "info_utf";
     public static final String COLUMN_STYPE = "stype";
+    public static final String COLUMN_PASSWORD = "password";
 
     public static final int VALUE_TRUE = 1;
 
-    public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer default 0, %s integer default 0, %s text)";
+    public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer default 0, %s integer default 0, %s text, %s text)";
 
     public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer default 0, %s text, %s text, %s text)";
     public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
@@ -105,7 +106,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(String.format(ADD_INDEX_SQL, tableName, COLUMN_ABBR));
         }
 
-        db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_VERSION, COLUMN_STYPE));
+        db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_VERSION, COLUMN_STYPE, COLUMN_PASSWORD));
         db.execSQL(String.format(ADD_UNIQUE_INDEXES_SQL, TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_STYPE));
     }
 
@@ -147,7 +148,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertDataLinks(List<DataLink> dataLinks) {
-        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s) VALUES (?, ?, ?, ?, (SELECT %6$s FROM %1$s WHERE %2$s = ? LIMIT 1));", TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_STYPE, COLUMN_VERSION);
+        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s) VALUES (?, ?, ?, ?, ?, (SELECT %6$s FROM %1$s WHERE %2$s = ? LIMIT 1));", TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_STYPE, COLUMN_PASSWORD, COLUMN_VERSION);
         SQLiteDatabase db = getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(insertSql);
         db.beginTransaction();
@@ -157,7 +158,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             statement.bindString(2, dataLink.getLink());
             statement.bindLong(3, dataLink.getUpdatedAt());
             statement.bindString(4, dataLink.getStype());
-            statement.bindLong(5, dataLink.getVol());
+            statement.bindString(5, dataLink.getPassword());
+            statement.bindLong(6, dataLink.getVol());
             statement.execute();
         }
         db.setTransactionSuccessful();
@@ -168,7 +170,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean updateLinkVersion(DataLink dataLink) {
         dataLink.setVersion(dataLink.getUpdatedAt());
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ?", TABLE_DATA_LINKS, COLUMN_VERSION, COLUMN_VOL), new String[]{String.valueOf(dataLink.getVersion()), String.valueOf(dataLink.getVol())});
+        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ? AND %s = ?", TABLE_DATA_LINKS, COLUMN_VERSION, COLUMN_VOL, COLUMN_STYPE), new String[]{String.valueOf(dataLink.getVersion()), String.valueOf(dataLink.getVol()), dataLink.getStype()});
         return true;
     }
 
@@ -293,6 +295,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dataLink.setUpdatedAt(res.getInt(res.getColumnIndex(COLUMN_UPDATED_AT)));
         dataLink.setStype(res.getString(res.getColumnIndex(COLUMN_STYPE)));
         dataLink.setVersion(res.getInt(res.getColumnIndex(COLUMN_VERSION)));
+        dataLink.setPassword(res.getString(res.getColumnIndex(COLUMN_PASSWORD)));
         return dataLink;
     }
 

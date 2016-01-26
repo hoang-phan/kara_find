@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class DataLink {
     private int vol;
     private String link;
+    private String password;
 
     @JsonProperty("updated_at")
     private long updatedAt;
@@ -59,11 +60,33 @@ public class DataLink {
         this.stype = stype;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public String getDecryptedPassword() {
+        String result = "";
+        for (int i = 0; i < password.length(); i++) {
+            char chr = password.charAt(i);
+            if (chr >= '0' && chr <= '9') {
+                result += String.valueOf((Integer.valueOf(chr + "") + 3) % 10);
+            } else {
+                result += chr;
+            }
+        }
+        return result;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String toString() {
         return "DataLink{" +
                 "vol=" + vol +
                 ", link='" + link + '\'' +
+                ", password='" + password + '\'' +
                 ", updatedAt=" + updatedAt +
                 ", version=" + version +
                 ", stype='" + stype + '\'' +
