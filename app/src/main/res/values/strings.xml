@@ -22,6 +22,7 @@
     <string name="find_by_abbr">Tìm tên viết tắt</string>
     <string name="abbreviate">Tên bài hát viết tắt ...</string>
     <string name="font_default">fonts/windsor.ttf</string>
+    <string name="no_songs_favorited">Chưa có bài hát nào được thêm vào yêu thích</string>
     <string-array name="languages">
         <item>Tiếng Việt</item>
         <item>English</item>

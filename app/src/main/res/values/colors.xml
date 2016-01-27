@@ -9,6 +9,7 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="color_accent">#83ddee</color>
+    <color name="color_accent_dark">#63aabb</color>
     <color name="title">#3333ff</color>
     <color name="primary">#960a0a</color>
     <color name="secondary">#f78b24</color>
@@ -18,4 +19,10 @@
     <color name="search_transparent">#aa37aecc</color>
     <color name="secondary_light">#ffc94e</color>
     <color name="tab_unselected">#3f51b5</color>
+    <color name="track_dark">#27170432</color>
+    <color name="track_light">#27281543</color>
+    <color name="thumb_on_start">#66AAFF00</color>
+    <color name="thumb_on_end">#6600FF00</color>
+    <color name="thumb_border">#0000ffff</color>
+    <color name="primary_light">#b82c2c</color>
 </resources>

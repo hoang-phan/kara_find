@@ -52,7 +52,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.languages, android.R.layout.simple_spinner_item);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.languages, R.layout.spinner_item_selected);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpnLanguage.setAdapter(adapter);
         mSpnLanguage.setSelection(PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE) == Constants.LOCALE_EN ? 1 : 0);
