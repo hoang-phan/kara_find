@@ -1,5 +1,6 @@
 package vn.hoangphan.karafind.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -42,14 +43,19 @@ public class SettingsFragment extends Fragment {
         mSwAutoUpdate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                PreferenceUtils.getInstance().saveConfig(Constants.AUTO_UPDATE, isChecked ? 1 : 0);
+                if (isChecked) {
+                    PreferenceUtils.getInstance().saveConfig(Constants.AUTO_UPDATE, 1);
+                    getActivity().sendBroadcast(new Intent(Constants.INTENT_AUTO_UPDATE_ON));
+                } else {
+                    PreferenceUtils.getInstance().saveConfig(Constants.AUTO_UPDATE, 0);
+                }
             }
         });
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), R.array.languages, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpnLanguage.setAdapter(adapter);
-        mSpnLanguage.setSelection(PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE) == "en" ? 1 : 0);
+        mSpnLanguage.setSelection(PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE) == Constants.LOCALE_EN ? 1 : 0);
 
         mSpnLanguage.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -73,9 +79,9 @@ public class SettingsFragment extends Fragment {
     private String languageFromSelect(int position) {
         switch (position) {
             case 0:
-                return "vi";
+                return Constants.LOCALE_VI;
             case 1:
-                return "en";
+                return Constants.LOCALE_EN;
         }
         return "";
     }

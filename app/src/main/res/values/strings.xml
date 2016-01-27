@@ -21,6 +21,7 @@
     <string name="find_all">Tìm tất cả</string>
     <string name="find_by_abbr">Tìm tên viết tắt</string>
     <string name="abbreviate">Tên bài hát viết tắt ...</string>
+    <string name="font_default">fonts/windsor.ttf</string>
     <string-array name="languages">
         <item>Tiếng Việt</item>
         <item>English</item>

@@ -31,7 +31,7 @@
             app:tabMaxWidth="0dp"
             app:tabGravity="fill"
             android:minHeight="@dimen/tab_height"
-            fontPath="circle.ttf"
+            fontPath="fonts/circle.ttf"
             style="@style/CustomTabLayout"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
     </LinearLayout>
