@@ -89,31 +89,55 @@ public class UpdateFragment extends Fragment {
     private void startUpdating() {
         mCbSelectAll.setVisibility(View.GONE);
         mTvSelectAll.setText(R.string.updating);
+        mBtnUpdate.setVisibility(View.GONE);
         mAdapter.updateSelected();
+    }
+
+    private void stopUpdating() {
+        mCbSelectAll.setVisibility(View.VISIBLE);
+        mBtnUpdate.setVisibility(View.VISIBLE);
+        mTvSelectAll.setText(mCbSelectAll.isChecked() ? R.string.unselect_all : R.string.select_all);
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        IntentFilter intentFilter = new IntentFilter(Constants.INTENT_GET_DATA_LINKS_COMPLETED);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(Constants.INTENT_GET_DATA_LINKS_COMPLETED);
+        intentFilter.addAction(Constants.INTENT_AUTO_UPDATE_ON);
+
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 long start = System.currentTimeMillis();
-                String label = intent.getStringExtra(Constants.VOL_LABEL);
-                mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
-                if (label != null) {
-                    Toast.makeText(getActivity(), String.format(getString(R.string.updated), label), Toast.LENGTH_SHORT).show();
-                } else {
-                    mCbSelectAll.setChecked(false);
-                    mCbSelectAll.setChecked(true);
-                    if (PreferenceUtils.getInstance().getConfigLong(Constants.AUTO_UPDATE) == 1) {
-                        mAdapter.updateSelected();
-                    }
+                switch (intent.getAction()) {
+                    case Constants.INTENT_GET_DATA_LINKS_COMPLETED:
+                        int label = intent.getIntExtra(Constants.VOL_LABEL, -1);
+                        String type = intent.getStringExtra(Constants.TYPE);
+                        mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
+                        if (label != -1) {
+                            Toast.makeText(getActivity(), String.format(getString(R.string.updated), type + " - VOL " + label), Toast.LENGTH_SHORT).show();
+                            if (mAdapter.notifyLinkUpdated(type, label)) {
+                                stopUpdating();
+                            }
+                        } else {
+                            mCbSelectAll.setChecked(false);
+                            mCbSelectAll.setChecked(true);
+                            if (PreferenceUtils.getInstance().getConfigLong(Constants.AUTO_UPDATE) == 1) {
+                                startUpdating();
+                            }
+                        }
+                        mAdapter.notifyDataSetChanged();
+                        checkLinksCount();
+                        break;
+                    case Constants.INTENT_AUTO_UPDATE_ON:
+                        mCbSelectAll.setChecked(false);
+                        mCbSelectAll.setChecked(true);
+                        startUpdating();
+                        break;
                 }
-                mAdapter.notifyDataSetChanged();
-                checkLinksCount();
+
                 Log.d("Receive time: ", (System.currentTimeMillis() - start) + " millis");
             }
         };

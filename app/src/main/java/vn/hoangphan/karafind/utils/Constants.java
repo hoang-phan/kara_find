@@ -8,6 +8,7 @@ public interface Constants {
     String INTENT_GET_DATA_LINKS_COMPLETED = "android.intent.action.GET_DATA_LINKS_COMPLETED";
     String INTENT_UPDATED_COMPLETED = "android.intent.action.UPDATED_COMPLETED";
     String INTENT_FAVORITE = "android.intent.action.INTENT_FAVORITE";
+    String INTENT_AUTO_UPDATE_ON = "android.intent.action.INTENT_AUTO_UPDATE_ON";
     String LAST_FETCHED_AT = "last_fetched_at";
     String PREFERRED_LANGUAGE = "preferred_lnguage";
     String MODE = "mode";
@@ -32,4 +33,7 @@ public interface Constants {
     String SONG_FAVORITE = "song_favorite";
     String AUTO_UPDATE = "auto_update";
     String ENCRYPTED_KEY = "encrypted_key";
+
+    String LOCALE_VI = "vi";
+    String LOCALE_EN = "en";
 }

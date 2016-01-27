@@ -96,7 +96,8 @@ public class UpdateService extends IntentService {
                     Log.d("Database time:", (System.currentTimeMillis() - time2) + " milliseconds");
 
                     Intent fragmentIntent = new Intent(Constants.INTENT_GET_DATA_LINKS_COMPLETED);
-                    fragmentIntent.putExtra(Constants.VOL_LABEL, dataLink.getStype() + " - VOL " + dataLink.getVol());
+                    fragmentIntent.putExtra(Constants.TYPE, dataLink.getStype());
+                    fragmentIntent.putExtra(Constants.VOL_LABEL, dataLink.getVol());
                     sendBroadcast(fragmentIntent);
                     Thread.sleep(200);
                     Log.d("Overall time:", (System.currentTimeMillis() - start) + " milliseconds");

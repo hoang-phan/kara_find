@@ -37,7 +37,7 @@ public class KaraokeActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
-                .setDefaultFontPath("fonts/windsor.ttf")
+                .setDefaultFontPath(getString(R.string.font_default))
                 .setFontAttrId(R.attr.fontPath)
                 .build());
         initConfigurations();
@@ -69,15 +69,15 @@ public class KaraokeActivity extends ActionBarActivity {
             return;
         }
 
-        if ("English".equals(Locale.getDefault().getDisplayLanguage())) {
+        if (getString(R.string.language_other).equals(Locale.getDefault().getDisplayLanguage())) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(getString(R.string.language_title));
             builder.setMessage(getString(R.string.language_choose_message));
             builder.setPositiveButton(getString(R.string.language_vi), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    mLocale = new Locale("vi");
-                    PreferenceUtils.getInstance().saveConfig(Constants.PREFERRED_LANGUAGE, "vi");
+                    mLocale = new Locale(Constants.LOCALE_VI);
+                    PreferenceUtils.getInstance().saveConfig(Constants.PREFERRED_LANGUAGE, Constants.LOCALE_VI);
                     LanguageUtils.getInstance().changeLanguage(mLocale);
                     proceed();
                 }
@@ -85,7 +85,7 @@ public class KaraokeActivity extends ActionBarActivity {
             builder.setNegativeButton(getString(R.string.language_other), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    PreferenceUtils.getInstance().saveConfig(Constants.PREFERRED_LANGUAGE, "en");
+                    PreferenceUtils.getInstance().saveConfig(Constants.PREFERRED_LANGUAGE, Constants.LOCALE_EN);
                     proceed();
                 }
             });

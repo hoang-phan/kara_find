@@ -86,6 +86,16 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         mActivity.startService(new Intent(mActivity, UpdateService.class));
     }
 
+    public boolean notifyLinkUpdated(String type, int vol) {
+        for (DataLink dataLink : mUpdatingLinks) {
+            if (type.equals(dataLink.getStype()) && vol == dataLink.getVol()) {
+                mUpdatingLinks.remove(dataLink);
+                break;
+            }
+        }
+        return mUpdatingLinks.isEmpty();
+    }
+
     @Override
     public int getItemCount() {
         return mDataLinks.size();
