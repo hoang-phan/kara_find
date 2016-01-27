@@ -13,12 +13,16 @@
             android:textColor="@color/primary"
             fontPath="fonts/circle.ttf"
             android:text="@string/auto_update"
+            android:textSize="@dimen/title_text_size"
             android:gravity="center_vertical"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:textSize="@dimen/title_text_size"
+            android:thumb="@drawable/switch_thumb"
+            android:track="@drawable/switch_track"
             android:id="@+id/sw_auto_update"/>
     </LinearLayout>
     <LinearLayout
@@ -31,9 +35,10 @@
             android:layout_weight="1"
             android:textColor="@color/primary"
             fontPath="fonts/circle.ttf"
+            android:textSize="@dimen/title_text_size"
             android:text="@string/language_title"
             android:gravity="center_vertical"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content" />
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

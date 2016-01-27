@@ -19,4 +19,5 @@
     <string name="find_all">Find all</string>
     <string name="find_by_abbr">Find by abbreviate name</string>
     <string name="abbreviate">Song name abbreviate ...</string>
+    <string name="no_songs_favorited">No songs added to favorite</string>
 </resources>

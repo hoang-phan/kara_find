@@ -58,6 +58,7 @@
             android:layout_gravity="center_horizontal"
             android:background="@null"
             android:textColor="@color/white"
+            android:textSize="@dimen/medium_text_size"
             android:id="@+id/btn_dismiss"
             android:text="@string/dismiss"/>
     </LinearLayout>
