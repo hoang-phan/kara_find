@@ -38,6 +38,7 @@ import vn.hoangphan.karafind.adapters.TypesAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.CryptoUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.OnSongDetailClick;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
@@ -63,7 +64,7 @@ public class SearchFragment extends BaseSongsFragment {
         if (TextUtils.isEmpty(filter)){
             mSongAdapter.setSongs(DatabaseHelper.getInstance().allSongs());
         } else {
-            String transformed = LanguageUtils.translateToUtf(filter);
+            String transformed = CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(filter));
             switch ((int)PreferenceUtils.getInstance().getConfigLong(Constants.MODE)) {
                 case Constants.MODE_FREE:
                     mSongAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(transformed));

@@ -22,6 +22,7 @@ import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.fragments.SongDetailsFragment;
 import vn.hoangphan.karafind.services.GetLinkService;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.CryptoUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
 import vn.hoangphan.karafind.views.NonSwipeableViewPager;
@@ -57,8 +58,7 @@ public class KaraokeActivity extends ActionBarActivity {
         DatabaseHelper.init(this);
         PreferenceUtils.init(this);
         LanguageUtils.init(this);
-
-        PreferenceUtils.getInstance().reset();
+        CryptoUtils.init();
 
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
@@ -132,7 +132,7 @@ public class KaraokeActivity extends ActionBarActivity {
             }
         });
         mPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mPager.setOffscreenPageLimit(3);
+        mPager.setOffscreenPageLimit(4);
 
         if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT))) {
             startService(new Intent(this, GetLinkService.class));

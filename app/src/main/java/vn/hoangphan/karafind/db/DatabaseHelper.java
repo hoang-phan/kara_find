@@ -13,6 +13,7 @@ import java.util.List;
 import vn.hoangphan.karafind.models.DataLink;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
+import vn.hoangphan.karafind.utils.CryptoUtils;
 import vn.hoangphan.karafind.utils.DatabaseUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
@@ -58,12 +59,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_VERSION = "version";
     public static final String COLUMN_INFO_UTF = "info_utf";
     public static final String COLUMN_STYPE = "stype";
+    public static final String COLUMN_PASSWORD = "password";
 
     public static final int VALUE_TRUE = 1;
 
-    public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer default 0, %s integer default 0, %s text)";
+    public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer default 0, %s integer default 0, %s text, %s text)";
 
-    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s text, %s text, %s text, %s text, %s integer, %s integer default 0, %s text, %s text, %s text)";
+    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s text, %s text, %s integer, %s integer default 0, %s text)";
     public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
 
     public static final String ADD_UNIQUE_INDEX_SQL = "CREATE UNIQUE INDEX `index_%2$s_%1$s` ON `%1$s` (`%2$s` ASC)";
@@ -96,7 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String tableInfo = DatabaseUtils.getTableFTSInfoName(type);
             String tableName = DatabaseUtils.getTableName(type);
 
-            db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, tableName, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR));
+            db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, tableName, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_ABBR));
             db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, tableLyrics, COLUMN_UTF));
             db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, tableInfo, COLUMN_INFO_UTF));
             db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, tableName, COLUMN_SONG_ID));
@@ -105,7 +107,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL(String.format(ADD_INDEX_SQL, tableName, COLUMN_ABBR));
         }
 
-        db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_VERSION, COLUMN_STYPE));
+        db.execSQL(String.format(CREATE_TABLE_DATA_LINKS_SQL, TABLE_DATA_LINKS, COLUMN_ID, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_VERSION, COLUMN_STYPE, COLUMN_PASSWORD));
         db.execSQL(String.format(ADD_UNIQUE_INDEXES_SQL, TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_STYPE));
     }
 
@@ -124,22 +126,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertSongs(List<Song> songs, String type) {
-        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s, %9$s, %10$s) VALUES (?, ?, ?, ?, ?, ?, ?, ?, (SELECT %10$s FROM %1$s WHERE %2$s = ? LIMIT 1));", DatabaseUtils.getTableName(type), COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_UTF, COLUMN_INFO_UTF, COLUMN_ABBR, COLUMN_FAVORITED);
+        String insertSql = String.format("REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s) VALUES (?, ?, ?, ?, ?, ?, (SELECT %8$s FROM %1$s WHERE %2$s = ? LIMIT 1));", DatabaseUtils.getTableName(type), COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_ABBR, COLUMN_FAVORITED);
+        String insertFtsLyricSql = String.format("REPLACE INTO %s(docid, %2$s) VALUES (?, ?);", DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF);
+        String insertFtsInfoSql = String.format("REPLACE INTO %s(docid, %2$s) VALUES (?, ?);", DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF);
+
         SQLiteDatabase db = getWritableDatabase();
-        SQLiteStatement statement = db.compileStatement(insertSql);
+        SQLiteStatement insertStmt = db.compileStatement(insertSql);
+        SQLiteStatement insertLyricStmt = db.compileStatement(insertFtsLyricSql);
+        SQLiteStatement insertInfoStmt = db.compileStatement(insertFtsInfoSql);
+
         db.beginTransaction();
         for (Song song : songs) {
-            statement.clearBindings();
-            statement.bindString(1, song.getId());
-            statement.bindString(2, song.getName());
-            statement.bindString(3, song.getLyric());
-            statement.bindString(4, song.getAuthor());
-            statement.bindLong(5, song.getVol());
-            statement.bindString(6, LanguageUtils.translateToUtf(song.getLyric()));
-            statement.bindString(7, LanguageUtils.translateToUtf(song.getName() + " " + song.getAuthor() + " " + song.getId()));
-            statement.bindString(8, LanguageUtils.translateToUtf(LanguageUtils.getFirstLetters(song.getName())));
-            statement.bindString(9, song.getId());
-            statement.execute();
+            insertStmt.clearBindings();
+            insertStmt.bindString(1, song.getId());
+            insertStmt.bindString(2, CryptoUtils.getInstance().encrypt(song.getName()));
+            insertStmt.bindString(3, CryptoUtils.getInstance().encrypt(song.getLyric()));
+            insertStmt.bindString(4, CryptoUtils.getInstance().encrypt(song.getAuthor()));
+            insertStmt.bindLong(5, song.getVol());
+            insertStmt.bindString(6, CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(LanguageUtils.getFirstLetters(song.getName()))));
+            insertStmt.bindString(7, song.getId());
+            insertStmt.execute();
+
+            insertLyricStmt.clearBindings();
+            insertLyricStmt.bindString(1, song.getId());
+            insertLyricStmt.bindString(2, CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(song.getLyric())));
+            insertLyricStmt.execute();
+
+            insertInfoStmt.clearBindings();
+            insertInfoStmt.bindString(1, song.getId());
+            insertInfoStmt.bindString(2, CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(song.getName() + " " + song.getAuthor() + " " + song.getId())));
+            insertInfoStmt.execute();
         }
         db.setTransactionSuccessful();
         db.endTransaction();
@@ -147,7 +163,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertDataLinks(List<DataLink> dataLinks) {
-        String insertSql = String.format("INSERT OR REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s) VALUES (?, ?, ?, ?, (SELECT %6$s FROM %1$s WHERE %2$s = ? LIMIT 1));", TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_STYPE, COLUMN_VERSION);
+        String insertSql = String.format("REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s) VALUES (?, ?, ?, ?, ?, (SELECT %6$s FROM %1$s WHERE %2$s = ? LIMIT 1));", TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_LINK, COLUMN_UPDATED_AT, COLUMN_STYPE, COLUMN_PASSWORD, COLUMN_VERSION);
         SQLiteDatabase db = getWritableDatabase();
         SQLiteStatement statement = db.compileStatement(insertSql);
         db.beginTransaction();
@@ -157,7 +173,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             statement.bindString(2, dataLink.getLink());
             statement.bindLong(3, dataLink.getUpdatedAt());
             statement.bindString(4, dataLink.getStype());
-            statement.bindLong(5, dataLink.getVol());
+            statement.bindString(5, dataLink.getPassword());
+            statement.bindLong(6, dataLink.getVol());
             statement.execute();
         }
         db.setTransactionSuccessful();
@@ -168,7 +185,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public boolean updateLinkVersion(DataLink dataLink) {
         dataLink.setVersion(dataLink.getUpdatedAt());
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ?", TABLE_DATA_LINKS, COLUMN_VERSION, COLUMN_VOL), new String[]{String.valueOf(dataLink.getVersion()), String.valueOf(dataLink.getVol())});
+        db.execSQL(String.format("UPDATE %s SET %s = ? WHERE %s = ? AND %s = ?", TABLE_DATA_LINKS, COLUMN_VERSION, COLUMN_VOL, COLUMN_STYPE), new String[]{String.valueOf(dataLink.getVersion()), String.valueOf(dataLink.getVol()), dataLink.getStype()});
         return true;
     }
 
@@ -183,33 +200,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean prepareFTSTables() {
-        SQLiteDatabase db = getWritableDatabase();
-        for (String type : Constants.ALL_TYPES) {
-            String tableLyrics = DatabaseUtils.getTableFTSLyricName(type);
-            String tableInfo = DatabaseUtils.getTableFTSInfoName(type);
-            String tableName = DatabaseUtils.getTableName(type);
-            db.delete(tableLyrics, null, null);
-            db.delete(tableInfo, null, null);
-            db.execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", tableLyrics, COLUMN_UTF, COLUMN_ID, tableName));
-            db.execSQL(String.format("INSERT INTO %1$s(docid, %2$s) SELECT %3$s, %2$s FROM %4$s", tableInfo, COLUMN_INFO_UTF, COLUMN_ID, tableName));
-        }
-
-        return true;
-    }
-
     public List<Song> songsMatch(String filter) {
         int type = getCurrentType();
         String matchLyricSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF, "0");
         String matchSongSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF, "1");
 
-        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %1$s.%5$s, %1$s.%6$s, %1$s.%7$s, %1$s.%8$s, %1$s.%9$s, %1$s.%10$s FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%3$s UNION ALL %2$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_ID, COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), new String[]{ filter, filter });
+        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %1$s.%4$s, %1$s.%5$s, %1$s.%6$s, %1$s.%7$s, %1$s.%8$s, %1$s.%9$s FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%3$s UNION ALL %2$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), new String[]{ filter, filter });
         return getSongs(res);
     }
 
     public List<Song> getSongsWithFirstLetters(String filter) {
         Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s WHERE %8$s LIKE ? ORDER BY LENGTH(%8$s) LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_ABBR), new String[] { filter + "%" });
         return getSongs(res);
+
     }
 
     public List<Song> allSongs() {
@@ -278,9 +281,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private Song getSong(Cursor res) {
         Song song = new Song();
         song.setId(res.getString(res.getColumnIndex(COLUMN_SONG_ID)));
-        song.setName(res.getString(res.getColumnIndex(COLUMN_NAME)));
-        song.setLyric(res.getString(res.getColumnIndex(COLUMN_LYRIC)));
-        song.setAuthor(res.getString(res.getColumnIndex(COLUMN_AUTHOR)));
+        song.setName(CryptoUtils.getInstance().decrypt(res.getString(res.getColumnIndex(COLUMN_NAME))));
+        song.setLyric(CryptoUtils.getInstance().decrypt(res.getString(res.getColumnIndex(COLUMN_LYRIC))));
+        song.setAuthor(CryptoUtils.getInstance().decrypt(res.getString(res.getColumnIndex(COLUMN_AUTHOR))));
         song.setVol(res.getInt(res.getColumnIndex(COLUMN_VOL)));
         song.setFavorited(res.getInt(res.getColumnIndex(COLUMN_FAVORITED)) == VALUE_TRUE);
         return song;
@@ -293,6 +296,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         dataLink.setUpdatedAt(res.getInt(res.getColumnIndex(COLUMN_UPDATED_AT)));
         dataLink.setStype(res.getString(res.getColumnIndex(COLUMN_STYPE)));
         dataLink.setVersion(res.getInt(res.getColumnIndex(COLUMN_VERSION)));
+        dataLink.setPassword(res.getString(res.getColumnIndex(COLUMN_PASSWORD)));
         return dataLink;
     }
 
