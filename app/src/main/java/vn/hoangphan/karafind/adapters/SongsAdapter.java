@@ -51,6 +51,7 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
                 mSongs.add(position, song);
                 notifyDataSetChanged();
                 mActivity.sendBroadcast(new Intent(Constants.INTENT_FAVORITE));
+                mActivity.sendBroadcast(new Intent(Constants.INTENT_UPDATED_COMPLETED));
             }
         });
     }
