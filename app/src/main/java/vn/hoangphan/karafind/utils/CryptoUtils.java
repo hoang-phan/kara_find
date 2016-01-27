@@ -1,5 +1,7 @@
 package vn.hoangphan.karafind.utils;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -14,6 +16,10 @@ public class CryptoUtils {
 
     public static void init() {
         instance = new CryptoUtils();
+    }
+
+    public static CryptoUtils getInstance() {
+        return instance;
     }
 
     private Map<Character, Character> mEncryptionMap = new HashMap<>();
@@ -46,8 +52,15 @@ public class CryptoUtils {
 
     private String transform(String src, Map<Character, Character> charSet) {
         StringBuilder builder = new StringBuilder();
+
         for (int i = 0, len = src.length(); i < len; i++) {
-            builder.append(charSet.get(src.charAt(i)));
+            char chr = src.charAt(i);
+            Object transformedChar;
+            if ((transformedChar = charSet.get(chr)) != null) {
+                builder.append(transformedChar);
+            } else {
+                builder.append(chr);
+            }
         }
         return builder.toString();
     }

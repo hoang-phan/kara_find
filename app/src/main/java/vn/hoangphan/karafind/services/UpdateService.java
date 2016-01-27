@@ -108,7 +108,6 @@ public class UpdateService extends IntentService {
                     e.printStackTrace();
                 }
             }
-            DatabaseHelper.getInstance().prepareFTSTables();
             sendBroadcast(new Intent(Constants.INTENT_UPDATED_COMPLETED));
 
             mIsRunning = false;
