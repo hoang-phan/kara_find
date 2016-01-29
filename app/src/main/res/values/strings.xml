@@ -23,6 +23,7 @@
     <string name="abbreviate">Tên bài hát viết tắt ...</string>
     <string name="font_default">fonts/windsor.ttf</string>
     <string name="no_songs_favorited">Chưa có bài hát nào được thêm vào yêu thích</string>
+    <string name="no_song_find">Không tìm thấy bài hát nào</string>
     <string-array name="languages">
         <item>Tiếng Việt</item>
         <item>English</item>
