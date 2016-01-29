@@ -15,3 +15,22 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-keepattributes Signature
+-keep class vn.hoangphan.karafind.models.** { *; }
+-dontwarn vn.hoangphan.karafind.models.**
+-keep class com.fasterxml.** { *; }
+-dontwarn com.fasterxml.**
+-keep class retrofit.** { *; }
+-dontwarn retrofit.**
+-keep class com.squareup.okhttp.** { *; }
+-dontwarn com.squareup.okhttp.**
+-keep class okio.** { *; }
+-dontwarn okio.**
+-keep class org.apache.http.** { *; }
+-keep class org.apache.james.mime4j.** { *; }
+-keep class javax.inject.** { *; }
+-keep class android.net.http.** { *; }
+-dontwarn android.net.http.**
+-dontwarn java.beans.**
+-dontwarn java.awt.**
+-dontwarn javax.swing.**

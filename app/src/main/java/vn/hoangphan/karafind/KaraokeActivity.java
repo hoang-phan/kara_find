@@ -24,6 +24,7 @@ import vn.hoangphan.karafind.services.GetLinkService;
 import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.CryptoUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
+import vn.hoangphan.karafind.utils.PagerUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
 import vn.hoangphan.karafind.views.NonSwipeableViewPager;
 
@@ -99,41 +100,7 @@ public class KaraokeActivity extends ActionBarActivity {
 
     private void proceed() {
         setContentView(R.layout.activity_karaoke);
-        initComponents();
-        bindComponents();
-    }
-
-    private void initComponents() {
-        mAdapter = new PagerAdapter(getSupportFragmentManager());
-        mTabLayout = (TabLayout)findViewById(R.id.tab_layout);
-        mPager = (NonSwipeableViewPager)findViewById(R.id.viewPager);
-    }
-
-    private void bindComponents() {
-        mPager.setAdapter(mAdapter);
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.search).setIcon(R.drawable.ic_search));
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.update).setIcon(R.drawable.ic_update));
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.settings).setIcon(R.drawable.ic_settings));
-        mTabLayout.addTab(mTabLayout.newTab().setText(R.string.favorite).setIcon(R.drawable.ic_star));
-        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                mPager.setCurrentItem(tab.getPosition());
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-        mPager.setOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mPager.setOffscreenPageLimit(4);
-
+        PagerUtils.init(this);
         if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT))) {
             startService(new Intent(this, GetLinkService.class));
         }

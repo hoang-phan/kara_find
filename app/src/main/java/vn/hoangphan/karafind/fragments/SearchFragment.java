@@ -24,6 +24,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -41,6 +42,7 @@ import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.CryptoUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.OnSongDetailClick;
+import vn.hoangphan.karafind.utils.PagerUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
 
 /**
@@ -57,14 +59,18 @@ public class SearchFragment extends BaseSongsFragment {
     private PopupWindow mPopupSearch;
     private ListView mLvModes;
     private ListView mLvTypes;
+    private Button mBtnToUpdate;
+    private LinearLayout mLyContentNone;
 
     @Override
     protected void populateData() {
         String filter = mEtSearch.getText().toString();
         if (TextUtils.isEmpty(filter)){
             mSongAdapter.setSongs(DatabaseHelper.getInstance().allSongs());
+            mBtnToUpdate.setVisibility(View.VISIBLE);
         } else {
-            String transformed = CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(filter));
+            mBtnToUpdate.setVisibility(View.GONE);
+            String transformed = LanguageUtils.translateToUtf(filter);
             switch ((int)PreferenceUtils.getInstance().getConfigLong(Constants.MODE)) {
                 case Constants.MODE_FREE:
                     mSongAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(transformed));
@@ -75,6 +81,13 @@ public class SearchFragment extends BaseSongsFragment {
             }
         }
         mSongAdapter.notifyDataSetChanged();
+        if (mSongAdapter.getItemCount() == 0) {
+            mRvSongs.setVisibility(View.GONE);
+            mLyContentNone.setVisibility(View.VISIBLE);
+        } else {
+            mRvSongs.setVisibility(View.VISIBLE);
+            mLyContentNone.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -92,6 +105,8 @@ public class SearchFragment extends BaseSongsFragment {
         mEtSearch = (EditText) view.findViewById(R.id.et_search);
         mIcSearch = (ImageView) view.findViewById(R.id.ic_search);
         mIcAdvance = (ImageView) view.findViewById(R.id.ic_advance);
+        mLyContentNone = (LinearLayout) view.findViewById(R.id.ly_content_none);
+        mBtnToUpdate = (Button) view.findViewById(R.id.btn_to_update);
 
         View advancePopupView = inflater.inflate(R.layout.popup_advance, null);
         mLvModes = (ListView)advancePopupView.findViewById(R.id.lv_modes);
@@ -136,6 +151,12 @@ public class SearchFragment extends BaseSongsFragment {
             @Override
             public void onClick(View v) {
                 togglePopupSearch();
+            }
+        });
+        mBtnToUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PagerUtils.getInstance().changePage(1);
             }
         });
 

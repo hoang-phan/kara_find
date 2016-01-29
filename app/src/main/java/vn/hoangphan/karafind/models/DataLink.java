@@ -3,6 +3,8 @@ package vn.hoangphan.karafind.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import vn.hoangphan.karafind.utils.CryptoUtils;
+
 /**
  * Created by Hoang Phan on 1/12/2016.
  */
@@ -65,16 +67,7 @@ public class DataLink {
     }
 
     public String getDecryptedPassword() {
-        String result = "";
-        for (int i = 0; i < password.length(); i++) {
-            char chr = password.charAt(i);
-            if (chr >= '0' && chr <= '9') {
-                result += String.valueOf((Integer.valueOf(chr + "") + 3) % 10);
-            } else {
-                result += chr;
-            }
-        }
-        return result;
+        return CryptoUtils.getInstance().getDecryptedPassword(password);
     }
 
     public void setPassword(String password) {

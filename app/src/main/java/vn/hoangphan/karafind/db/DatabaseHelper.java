@@ -13,7 +13,6 @@ import java.util.List;
 import vn.hoangphan.karafind.models.DataLink;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
-import vn.hoangphan.karafind.utils.CryptoUtils;
 import vn.hoangphan.karafind.utils.DatabaseUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
@@ -139,22 +138,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         for (Song song : songs) {
             insertStmt.clearBindings();
             insertStmt.bindString(1, song.getId());
-            insertStmt.bindString(2, CryptoUtils.getInstance().encrypt(song.getName()));
-            insertStmt.bindString(3, CryptoUtils.getInstance().encrypt(song.getLyric()));
-            insertStmt.bindString(4, CryptoUtils.getInstance().encrypt(song.getAuthor()));
+            insertStmt.bindString(2, song.getName());
+            insertStmt.bindString(3, song.getLyric());
+            insertStmt.bindString(4, song.getAuthor());
             insertStmt.bindLong(5, song.getVol());
-            insertStmt.bindString(6, CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(LanguageUtils.getFirstLetters(song.getName()))));
+            insertStmt.bindString(6, LanguageUtils.translateToUtf(LanguageUtils.getFirstLetters(song.getName())));
             insertStmt.bindString(7, song.getId());
             insertStmt.execute();
 
             insertLyricStmt.clearBindings();
             insertLyricStmt.bindString(1, song.getId());
-            insertLyricStmt.bindString(2, CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(song.getLyric())));
+            insertLyricStmt.bindString(2, LanguageUtils.translateToUtf(song.getLyric()));
             insertLyricStmt.execute();
 
             insertInfoStmt.clearBindings();
             insertInfoStmt.bindString(1, song.getId());
-            insertInfoStmt.bindString(2, CryptoUtils.getInstance().encrypt(LanguageUtils.translateToUtf(song.getName() + " " + song.getAuthor() + " " + song.getId())));
+            insertInfoStmt.bindString(2, LanguageUtils.translateToUtf(song.getName() + " " + song.getAuthor() + " " + song.getId()));
             insertInfoStmt.execute();
         }
         db.setTransactionSuccessful();
@@ -212,7 +211,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Song> getSongsWithFirstLetters(String filter) {
         Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s WHERE %8$s LIKE ? ORDER BY LENGTH(%8$s) LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_ABBR), new String[] { filter + "%" });
         return getSongs(res);
-
     }
 
     public List<Song> allSongs() {
@@ -281,9 +279,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private Song getSong(Cursor res) {
         Song song = new Song();
         song.setId(res.getString(res.getColumnIndex(COLUMN_SONG_ID)));
-        song.setName(CryptoUtils.getInstance().decrypt(res.getString(res.getColumnIndex(COLUMN_NAME))));
-        song.setLyric(CryptoUtils.getInstance().decrypt(res.getString(res.getColumnIndex(COLUMN_LYRIC))));
-        song.setAuthor(CryptoUtils.getInstance().decrypt(res.getString(res.getColumnIndex(COLUMN_AUTHOR))));
+        song.setName(res.getString(res.getColumnIndex(COLUMN_NAME)));
+        song.setLyric(res.getString(res.getColumnIndex(COLUMN_LYRIC)));
+        song.setAuthor(res.getString(res.getColumnIndex(COLUMN_AUTHOR)));
         song.setVol(res.getInt(res.getColumnIndex(COLUMN_VOL)));
         song.setFavorited(res.getInt(res.getColumnIndex(COLUMN_FAVORITED)) == VALUE_TRUE);
         return song;
