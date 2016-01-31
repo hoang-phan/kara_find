@@ -242,10 +242,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         res.moveToFirst();
 
         while (!res.isAfterLast()) {
-            DataLink dataLink = getDataLink(res);
-            if (dataLink.getUpdatedAt() > dataLink.getVersion()) {
-                dataLinks.add(dataLink);
-            }
+            dataLinks.add(getDataLink(res));
             res.moveToNext();
         }
 
