@@ -3,7 +3,6 @@ package vn.hoangphan.karafind.views;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
 import android.util.Log;
 
 /**
@@ -17,14 +16,6 @@ public class NPALinearLayoutManager extends LinearLayoutManager {
 
     public NPALinearLayoutManager(Context context) {
         super(context);
-    }
-
-    public NPALinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
-        super(context, orientation, reverseLayout);
-    }
-
-    public NPALinearLayoutManager(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
     }
 
     @Override
