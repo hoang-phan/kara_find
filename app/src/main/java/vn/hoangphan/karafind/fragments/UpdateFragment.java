@@ -62,7 +62,6 @@ public class UpdateFragment extends Fragment {
         mCbSelectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                long start = System.currentTimeMillis();
                 if (isChecked) {
                     mAdapter.selectAll();
                     mTvSelectAll.setText(R.string.unselect_all);
@@ -70,7 +69,6 @@ public class UpdateFragment extends Fragment {
                     mAdapter.unselectAll();
                     mTvSelectAll.setText(R.string.select_all);
                 }
-                Log.d("Checked changed time: ", (System.currentTimeMillis() - start) + " millis");
             }
         });
         mBtnUpdate.setOnClickListener(new View.OnClickListener() {
@@ -110,7 +108,6 @@ public class UpdateFragment extends Fragment {
         mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                long start = System.currentTimeMillis();
                 switch (intent.getAction()) {
                     case Constants.INTENT_GET_DATA_LINKS_COMPLETED:
                         int label = intent.getIntExtra(Constants.VOL_LABEL, -1);
@@ -137,8 +134,6 @@ public class UpdateFragment extends Fragment {
                         startUpdating();
                         break;
                 }
-
-                Log.d("Receive time: ", (System.currentTimeMillis() - start) + " millis");
             }
         };
 

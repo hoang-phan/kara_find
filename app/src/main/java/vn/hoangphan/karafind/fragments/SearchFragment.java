@@ -1,22 +1,16 @@
 package vn.hoangphan.karafind.fragments;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Bundle;
 import android.speech.RecognizerIntent;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,21 +21,17 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import vn.hoangphan.karafind.R;
 import vn.hoangphan.karafind.adapters.ModesAdapter;
-import vn.hoangphan.karafind.adapters.SongsAdapter;
 import vn.hoangphan.karafind.adapters.TypesAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
-import vn.hoangphan.karafind.utils.CryptoUtils;
 import vn.hoangphan.karafind.utils.LanguageUtils;
-import vn.hoangphan.karafind.utils.OnSongDetailClick;
 import vn.hoangphan.karafind.utils.PagerUtils;
 import vn.hoangphan.karafind.utils.PreferenceUtils;
 
@@ -52,8 +42,9 @@ public class SearchFragment extends BaseSongsFragment {
     private static final int REQUEST_CODE = 1234;
 
     private EditText mEtSearch;
-    private ImageView mIcSearch;
+    private ImageView mIcVoice;
     private ImageView mIcAdvance;
+    private ImageView mIcClear;
     private ModesAdapter mModesAdapter;
     private TypesAdapter mTypesAdapter;
     private PopupWindow mPopupSearch;
@@ -61,32 +52,41 @@ public class SearchFragment extends BaseSongsFragment {
     private ListView mLvTypes;
     private Button mBtnToUpdate;
     private LinearLayout mLyContentNone;
+    private Thread mDatabaseThread;
 
     @Override
     protected void populateData() {
-        String filter = mEtSearch.getText().toString();
+        if (mDatabaseThread != null && mDatabaseThread.isAlive()) {
+            mDatabaseThread.interrupt();
+        }
+
+        final String filter = mEtSearch.getText().toString();
+        mDatabaseThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final List<Song> dataList = getSongs(filter);
+                mSongAdapter.setSongs(dataList);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (dataList.isEmpty()) {
+                            mRvSongs.setVisibility(View.GONE);
+                            mLyContentNone.setVisibility(View.VISIBLE);
+                        } else {
+                            mRvSongs.setVisibility(View.VISIBLE);
+                            mLyContentNone.setVisibility(View.GONE);
+                        }
+                        mSongAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+        mDatabaseThread.start();
+
         if (TextUtils.isEmpty(filter)){
-            mSongAdapter.setSongs(DatabaseHelper.getInstance().allSongs());
             mBtnToUpdate.setVisibility(View.VISIBLE);
         } else {
             mBtnToUpdate.setVisibility(View.GONE);
-            String transformed = LanguageUtils.translateToUtf(filter);
-            switch ((int)PreferenceUtils.getInstance().getConfigLong(Constants.MODE)) {
-                case Constants.MODE_FREE:
-                    mSongAdapter.setSongs(DatabaseHelper.getInstance().songsMatch(transformed));
-                    break;
-                case Constants.MODE_ABBR:
-                    mSongAdapter.setSongs(DatabaseHelper.getInstance().getSongsWithFirstLetters(transformed));
-                    break;
-            }
-        }
-        mSongAdapter.notifyDataSetChanged();
-        if (mSongAdapter.getItemCount() == 0) {
-            mRvSongs.setVisibility(View.GONE);
-            mLyContentNone.setVisibility(View.VISIBLE);
-        } else {
-            mRvSongs.setVisibility(View.VISIBLE);
-            mLyContentNone.setVisibility(View.GONE);
         }
     }
 
@@ -103,8 +103,9 @@ public class SearchFragment extends BaseSongsFragment {
     @Override
     protected void extraInit(View view, LayoutInflater inflater) {
         mEtSearch = (EditText) view.findViewById(R.id.et_search);
-        mIcSearch = (ImageView) view.findViewById(R.id.ic_search);
+        mIcVoice = (ImageView) view.findViewById(R.id.ic_voice);
         mIcAdvance = (ImageView) view.findViewById(R.id.ic_advance);
+        mIcClear = (ImageView) view.findViewById(R.id.ic_clear);
         mLyContentNone = (LinearLayout) view.findViewById(R.id.ly_content_none);
         mBtnToUpdate = (Button) view.findViewById(R.id.btn_to_update);
 
@@ -141,7 +142,7 @@ public class SearchFragment extends BaseSongsFragment {
 
     @Override
     protected void extraPopulate(View view) {
-        mIcSearch.setOnClickListener(new View.OnClickListener() {
+        mIcVoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startVoiceRecognition();
@@ -151,6 +152,12 @@ public class SearchFragment extends BaseSongsFragment {
             @Override
             public void onClick(View v) {
                 togglePopupSearch();
+            }
+        });
+        mIcClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mEtSearch.setText("");
             }
         });
         mBtnToUpdate.setOnClickListener(new View.OnClickListener() {
@@ -177,7 +184,7 @@ public class SearchFragment extends BaseSongsFragment {
 
         PackageManager packageManager = getActivity().getPackageManager();
         List<ResolveInfo> infos = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
-        mIcSearch.setEnabled(infos.size() > 0);
+        mIcVoice.setEnabled(infos.size() > 0);
     }
 
     private void togglePopupSearch() {
@@ -216,5 +223,19 @@ public class SearchFragment extends BaseSongsFragment {
             mPopupSearch.dismiss();
         }
         super.onDestroy();
+    }
+
+    private List<Song> getSongs(String filter) {
+        if (TextUtils.isEmpty(filter)) {
+            return DatabaseHelper.getInstance().allSongs();
+        }
+        String transformed = LanguageUtils.translateToUtf(filter);
+        switch ((int)PreferenceUtils.getInstance().getConfigLong(Constants.MODE)) {
+            case Constants.MODE_FREE:
+                return DatabaseHelper.getInstance().songsMatch(transformed);
+            case Constants.MODE_ABBR:
+                return DatabaseHelper.getInstance().getSongsWithFirstLetters(transformed);
+        }
+        return new ArrayList<>();
     }
 }

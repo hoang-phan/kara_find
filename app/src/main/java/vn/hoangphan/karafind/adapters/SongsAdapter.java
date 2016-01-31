@@ -40,20 +40,22 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
 
     @Override
     public void onBindViewHolder(SongHolder holder, final int position) {
-        final Song song = mSongs.get(position);
-        holder.populate(song);
-        holder.mIvFavorited.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                song.setFavorited(!song.isFavorited());
-                DatabaseHelper.getInstance().updateFavorite(song);
-                mSongs.remove(position);
-                mSongs.add(position, song);
-                notifyDataSetChanged();
-                mActivity.sendBroadcast(new Intent(Constants.INTENT_FAVORITE));
-                mActivity.sendBroadcast(new Intent(Constants.INTENT_UPDATED_COMPLETED));
-            }
-        });
+        if (position < mSongs.size()) {
+            final Song song = mSongs.get(position);
+            holder.populate(song);
+            holder.mIvFavorited.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    song.setFavorited(!song.isFavorited());
+                    DatabaseHelper.getInstance().updateFavorite(song);
+                    mSongs.remove(position);
+                    mSongs.add(position, song);
+                    notifyDataSetChanged();
+                    mActivity.sendBroadcast(new Intent(Constants.INTENT_FAVORITE));
+                    mActivity.sendBroadcast(new Intent(Constants.INTENT_UPDATED_COMPLETED));
+                }
+            });
+        }
     }
 
     @Override

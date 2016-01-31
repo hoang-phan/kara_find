@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +17,7 @@ import vn.hoangphan.karafind.adapters.SongsAdapter;
 import vn.hoangphan.karafind.models.Song;
 import vn.hoangphan.karafind.utils.Constants;
 import vn.hoangphan.karafind.utils.OnSongDetailClick;
+import vn.hoangphan.karafind.views.NPALinearLayoutManager;
 
 /**
  * Created by eastagile-tc on 1/25/16.
@@ -40,7 +40,7 @@ public abstract class BaseSongsFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         mRvSongs.setAdapter(mSongAdapter);
-        mRvSongs.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRvSongs.setLayoutManager(new NPALinearLayoutManager(getActivity()));
         mSongAdapter.setOnSongDetailClick(new OnSongDetailClick() {
             @Override
             public void view(Song song) {
