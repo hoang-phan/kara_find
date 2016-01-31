@@ -224,7 +224,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public List<Song> getSongs(Cursor res) {
-        long current = System.currentTimeMillis();
         List<Song> songs = new ArrayList<>();
         res.moveToFirst();
 
@@ -232,7 +231,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             songs.add(getSong(res));
             res.moveToNext();
         }
-        Log.e("Database query time: ", (System.currentTimeMillis() - current) + " milliseconds");
         return songs;
     }
 
@@ -255,8 +253,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void dropDb(SQLiteDatabase db) {
-        long current = System.currentTimeMillis();
-
         for (String type : Constants.ALL_TYPES) {
             String tableLyrics = DatabaseUtils.getTableFTSLyricName(type);
             String tableInfo = DatabaseUtils.getTableFTSInfoName(type);
@@ -273,7 +269,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.execSQL(String.format(DROP_INDEXES_SQL, TABLE_DATA_LINKS, COLUMN_VOL, COLUMN_STYPE));
         db.execSQL(String.format(DROP_TABLE_SQL, TABLE_DATA_LINKS));
-        Log.d("Drop DB time", (System.currentTimeMillis() - current) + " milliseconds");
     }
 
     private Song getSong(Cursor res) {

@@ -29,10 +29,7 @@ public class GetLinkService extends IntentService {
             @Override
             public void onResponse(Response<DataLinksResponse> response, Retrofit retrofit) {
                 if (response != null && response.body() != null) {
-                    Log.d("Retrofit: ", response.body().getDataLinks().toString());
-                    long time = System.currentTimeMillis();
                     DatabaseHelper.getInstance().insertDataLinks(response.body().getDataLinks());
-                    Log.d("Insert Data Links time", (System.currentTimeMillis() - time) + " milliseconds");
                     PreferenceUtils.getInstance().saveConfig(Constants.LAST_FETCHED_AT, System.currentTimeMillis());
                     Intent intent = new Intent(Constants.INTENT_GET_DATA_LINKS_COMPLETED);
                     sendBroadcast(intent);
