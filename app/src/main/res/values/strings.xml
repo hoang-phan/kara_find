@@ -4,7 +4,7 @@
     <string name="update">Cập nhật</string>
     <string name="update_all">Cập nhật tất cả</string>
     <string name="updating">Đang cập nhật ...</string>
-    <string name="updated">Cập nhật thành công %s!</string>
+    <string name="updated_successfully">Cập nhật thành công %s!</string>
     <string name="name_author_or_lyric">Bài hát, tác giả hoặc lời ...</string>
     <string name="dismiss">Tắt</string>
     <string name="settings">Cài đặt</string>
@@ -16,7 +16,7 @@
     <string name="select_all">Chọn tất cả</string>
     <string name="unselect_all">Bỏ chọn tất cả</string>
     <string name="auto_update">Tự động cập nhật</string>
-    <string name="no_update">Hiện không có bản cập nhật nào</string>
+    <string name="no_update">Không có bản cập nhật mới</string>
     <string name="favorite">Yêu thích</string>
     <string name="find_all">Tìm tất cả</string>
     <string name="find_by_abbr">Tìm tên viết tắt</string>
@@ -24,6 +24,9 @@
     <string name="font_default">fonts/windsor.ttf</string>
     <string name="no_songs_favorited">Chưa có bài hát nào được thêm vào yêu thích</string>
     <string name="no_song_find">Không tìm thấy bài hát nào</string>
+    <string name="updated">Đã cập nhật</string>
+    <string name="show_updated"><u>Hiện các bản đã cập nhật</u></string>
+    <string name="hide_updated"><u>Ẩn các bản đã cập nhật</u></string>
     <string-array name="languages">
         <item>Tiếng Việt</item>
         <item>English</item>

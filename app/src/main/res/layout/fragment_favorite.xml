@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/activity_horizontal_margin"
         android:text="@string/no_songs_favorited"
+        android:gravity="center_horizontal"
         android:id="@+id/tv_no_song"
         android:visibility="gone"
         android:textSize="@dimen/title_text_size"

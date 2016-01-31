@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +36,7 @@ public class UpdateFragment extends Fragment {
     private TextView mTvSelectAll;
     private LinearLayout mLyHeader;
     private LinearLayout mLyHeaderNone;
+    private TextView mTvShowUpdated;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -48,17 +48,27 @@ public class UpdateFragment extends Fragment {
         mBtnUpdate = (Button) view.findViewById(R.id.btn_update);
         mLyHeader = (LinearLayout) view.findViewById(R.id.ly_update_header);
         mLyHeaderNone = (LinearLayout) view.findViewById(R.id.ly_update_header_none);
+        mTvShowUpdated = (TextView) view.findViewById(R.id.tv_toggle_show_updated);
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mTvShowUpdated.setText(mAdapter.isShowUpdated() ? R.string.hide_updated : R.string.show_updated);
         mRvDataLinks.setAdapter(mAdapter);
         mRvDataLinks.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
         mAdapter.notifyDataSetChanged();
-        checkLinksCount();
+        checkLinksUpdated();
+        mTvShowUpdated.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdapter.setShowUpdated(!mAdapter.isShowUpdated());
+                mAdapter.notifyDataSetChanged();
+                mTvShowUpdated.setText(mAdapter.isShowUpdated() ? R.string.hide_updated : R.string.show_updated);
+            }
+        });
         mCbSelectAll.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -114,7 +124,7 @@ public class UpdateFragment extends Fragment {
                         String type = intent.getStringExtra(Constants.TYPE);
                         mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
                         if (label != -1) {
-                            Toast.makeText(getActivity(), String.format(getString(R.string.updated), type + " - VOL " + label), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), String.format(getString(R.string.updated_successfully), type + " - VOL " + label), Toast.LENGTH_SHORT).show();
                             if (mAdapter.notifyLinkUpdated(type, label)) {
                                 stopUpdating();
                             }
@@ -126,7 +136,7 @@ public class UpdateFragment extends Fragment {
                             }
                         }
                         mAdapter.notifyDataSetChanged();
-                        checkLinksCount();
+                        checkLinksUpdated();
                         break;
                     case Constants.INTENT_AUTO_UPDATE_ON:
                         mCbSelectAll.setChecked(false);
@@ -146,8 +156,8 @@ public class UpdateFragment extends Fragment {
         super.onPause();
     }
 
-    private void checkLinksCount() {
-        if (mAdapter.getItemCount() == 0) {
+    private void checkLinksUpdated() {
+        if (mAdapter.isAllLinksUpdated()) {
             mLyHeader.setVisibility(View.GONE);
             mLyHeaderNone.setVisibility(View.VISIBLE);
         } else {

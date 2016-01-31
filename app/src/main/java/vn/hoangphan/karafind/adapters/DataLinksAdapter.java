@@ -28,6 +28,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
     private Set<DataLink> mSelectedLinks = new HashSet<>();
     private Set<DataLink> mUpdatingLinks = new HashSet<>();
     private Activity mActivity;
+    private boolean mShowUpdated = false;
 
     public DataLinksAdapter(Activity activity) {
         mActivity = activity;
@@ -41,13 +42,16 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
 
     @Override
     public void onBindViewHolder(final DataLinkHolder holder, final int position) {
-        final DataLink dataLink = mDataLinks.get(position);
+        final DataLink dataLink = mShowUpdated ? mDataLinks.get(position) : nonUpdatedDataLink().get(position);
         holder.mTvVol.setText("VOL " + dataLink.getVol());
         holder.mTvType.setText(dataLink.getStype());
-        if (mUpdatingLinks.contains(dataLink)) {
+        if (dataLink.getVersion() == dataLink.getUpdatedAt()) {
+            holder.mCbSelect.setVisibility(View.INVISIBLE);
+            holder.mTvUpdatedAt.setText(R.string.updated);
+        } else if (mUpdatingLinks.contains(dataLink)) {
             holder.mCbSelect.setVisibility(View.INVISIBLE);
             holder.mTvUpdatedAt.setText(R.string.updating);
-        } else {
+        }else {
             holder.mCbSelect.setVisibility(View.VISIBLE);
             holder.mTvUpdatedAt.setText(CalendarUtils.secondToDateTime(dataLink.getUpdatedAt()));
             holder.mCbSelect.setChecked(mSelectedLinks.contains(dataLink));
@@ -96,13 +100,40 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
         return mUpdatingLinks.isEmpty();
     }
 
+    public boolean isAllLinksUpdated() {
+        for (DataLink dataLink : mDataLinks) {
+            if (dataLink.getVersion() < dataLink.getUpdatedAt()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean isShowUpdated() {
+        return mShowUpdated;
+    }
+
+    public void setShowUpdated(boolean showUpdated) {
+        this.mShowUpdated = showUpdated;
+    }
+
     @Override
     public int getItemCount() {
-        return mDataLinks.size();
+        return mShowUpdated ? mDataLinks.size() : nonUpdatedDataLink().size();
     }
 
     public void setDataLinks(List<DataLink> dataLinks) {
         mDataLinks = dataLinks;
+    }
+
+    private List<DataLink> nonUpdatedDataLink() {
+        List<DataLink> result = new ArrayList<>();
+        for (DataLink dataLink : mDataLinks) {
+            if (dataLink.getUpdatedAt() > dataLink.getVersion()) {
+                result.add(dataLink);
+            }
+        }
+        return result;
     }
 
     public static class DataLinkHolder extends ViewHolder {

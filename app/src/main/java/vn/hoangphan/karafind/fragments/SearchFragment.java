@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -53,6 +54,8 @@ public class SearchFragment extends BaseSongsFragment {
     private Button mBtnToUpdate;
     private LinearLayout mLyContentNone;
     private Thread mDatabaseThread;
+    private List<Runnable> mNotifyChangeRunners;
+    private boolean isRunning = false;
 
     @Override
     protected void populateData() {
@@ -66,9 +69,10 @@ public class SearchFragment extends BaseSongsFragment {
             public void run() {
                 final List<Song> dataList = getSongs(filter);
                 mSongAdapter.setSongs(dataList);
-                getActivity().runOnUiThread(new Runnable() {
+                mNotifyChangeRunners.add(new Runnable() {
                     @Override
                     public void run() {
+                        isRunning = true;
                         if (dataList.isEmpty()) {
                             mRvSongs.setVisibility(View.GONE);
                             mLyContentNone.setVisibility(View.VISIBLE);
@@ -79,6 +83,7 @@ public class SearchFragment extends BaseSongsFragment {
                         mSongAdapter.notifyDataSetChanged();
                     }
                 });
+                triggerRun();
             }
         });
         mDatabaseThread.start();
@@ -102,6 +107,7 @@ public class SearchFragment extends BaseSongsFragment {
 
     @Override
     protected void extraInit(View view, LayoutInflater inflater) {
+        mNotifyChangeRunners = new ArrayList<>();
         mEtSearch = (EditText) view.findViewById(R.id.et_search);
         mIcVoice = (ImageView) view.findViewById(R.id.ic_voice);
         mIcAdvance = (ImageView) view.findViewById(R.id.ic_advance);
@@ -142,6 +148,13 @@ public class SearchFragment extends BaseSongsFragment {
 
     @Override
     protected void extraPopulate(View view) {
+        getView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                isRunning = false;
+            }
+        });
+
         mIcVoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,5 +250,16 @@ public class SearchFragment extends BaseSongsFragment {
                 return DatabaseHelper.getInstance().getSongsWithFirstLetters(transformed);
         }
         return new ArrayList<>();
+    }
+
+    private void triggerRun() {
+        if (isRunning) {
+            return;
+        }
+        isRunning = true;
+        if (!mNotifyChangeRunners.isEmpty()) {
+            getActivity().runOnUiThread(mNotifyChangeRunners.get(0));
+            mNotifyChangeRunners.clear();
+        }
     }
 }

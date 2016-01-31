@@ -5,6 +5,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:id="@+id/ly_update_header_none"
         android:layout_margin="@dimen/activity_horizontal_margin"
         android:visibility="gone">
@@ -16,6 +17,13 @@
             android:textSize="@dimen/title_text_size"
             android:text="@string/no_update"/>
     </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/title"
+        android:layout_gravity="center_horizontal"
+        android:textSize="@dimen/small_text_size"
+        android:id="@+id/tv_toggle_show_updated"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:textColor="@color/primary_light"
+            android:textSize="@dimen/small_text_size"
             android:text="@string/select_all"
             android:id="@+id/tv_select_all"/>
         <Button

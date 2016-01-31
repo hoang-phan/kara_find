@@ -4,7 +4,7 @@
     <string name="update">Update</string>
     <string name="update_all">Update all</string>
     <string name="updating">Updating ...</string>
-    <string name="updated">Successfully updated %s!</string>
+    <string name="updated_successfully">Successfully updated %s!</string>
     <string name="name_author_or_lyric">Name, Author or Lyric ...</string>
     <string name="dismiss">Dismiss</string>
     <string name="settings">Settings</string>
@@ -14,7 +14,7 @@
     <string name="select_all">Select all</string>
     <string name="unselect_all">Unselect all</string>
     <string name="auto_update">Auto Update</string>
-    <string name="no_update">No updates available.</string>
+    <string name="no_update">No new updates available.</string>
     <string name="favorite">Favorite</string>
     <string name="find_all">Find all</string>
     <string name="find_by_abbr">Find by abbreviate name</string>
@@ -28,4 +28,7 @@
         <item>Tiếng Việt</item>
         <item>English</item>
     </string-array>
+    <string name="updated">Updated</string>
+    <string name="show_updated"><u>Show updated</u></string>
+    <string name="hide_updated"><u>Hide updated</u></string>
 </resources>
