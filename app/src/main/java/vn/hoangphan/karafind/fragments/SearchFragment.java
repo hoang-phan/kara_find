@@ -6,11 +6,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.speech.RecognitionService;
 import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ public class SearchFragment extends BaseSongsFragment {
     private LinearLayout mLyContentNone;
     private Thread mDatabaseThread;
     private List<Runnable> mNotifyChangeRunners;
+    private PackageManager mPackageManager;
     private boolean isRunning = false;
 
     @Override
@@ -144,6 +146,7 @@ public class SearchFragment extends BaseSongsFragment {
             }
         });
         mPopupSearch = new PopupWindow(advancePopupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mPackageManager = getActivity().getPackageManager();
     }
 
     @Override
@@ -194,10 +197,6 @@ public class SearchFragment extends BaseSongsFragment {
                 populateData();
             }
         });
-
-        PackageManager packageManager = getActivity().getPackageManager();
-        List<ResolveInfo> infos = packageManager.queryIntentActivities(new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH), 0);
-        mIcVoice.setEnabled(infos.size() > 0);
     }
 
     private void togglePopupSearch() {
@@ -212,10 +211,15 @@ public class SearchFragment extends BaseSongsFragment {
     }
 
     private void startVoiceRecognition() {
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi");
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getResources().getString(R.string.say_words));
-        startActivityForResult(intent, REQUEST_CODE);
+        List<ResolveInfo> infos = mPackageManager.queryIntentServices(new Intent(RecognitionService.SERVICE_INTERFACE), 0);
+        if (infos.isEmpty()) {
+            Toast.makeText(getActivity(), R.string.no_service_available, Toast.LENGTH_LONG).show();
+        } else {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi");
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getResources().getString(R.string.say_words));
+            startActivityForResult(intent, REQUEST_CODE);
+        }
     }
 
     @Override
