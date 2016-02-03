@@ -58,5 +58,6 @@ public class PagerUtils {
 
     public void changePage(int position) {
         mPager.setCurrentItem(position);
+        mTabLayout.setScrollPosition(position, 0, true);
     }
 }
