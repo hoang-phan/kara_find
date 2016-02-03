@@ -71,7 +71,7 @@ public class DataLinksAdapter extends Adapter<DataLinksAdapter.DataLinkHolder> {
 
     public void selectAll() {
         mSelectedLinks.clear();
-        mSelectedLinks.addAll(mDataLinks);
+        mSelectedLinks.addAll(nonUpdatedDataLink());
         notifyDataSetChanged();
     }
 
