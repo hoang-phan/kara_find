@@ -87,7 +87,6 @@ public class UpdateFragment extends Fragment {
                 startUpdating();
             }
         });
-        mCbSelectAll.setChecked(false);
         mCbSelectAll.setChecked(true);
         if (PreferenceUtils.getInstance().getConfigLong(Constants.AUTO_UPDATE) == 1) {
             startUpdating();

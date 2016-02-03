@@ -24,6 +24,7 @@
     <string name="language_other">English</string>
     <string name="font_default">fonts/windsor.ttf</string>
     <string name="no_song_find">No song was found</string>
+    <string name="no_service_available">No service available! Please check yous settings</string>
     <string-array name="languages">
         <item>Tiếng Việt</item>
         <item>English</item>
