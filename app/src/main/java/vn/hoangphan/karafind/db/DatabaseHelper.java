@@ -21,6 +21,7 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
  * Created by eastagile-tc on 1/12/16.
  */
 public class DatabaseHelper extends SQLiteOpenHelper {
+    public static final int VERSION_CODE = 2;
     public static final String DATABASE_NAME = "kara.db";
     public static final String TABLE_DATA_LINKS = "data_links";
 
@@ -88,7 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public DatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, VERSION_CODE);
     }
 
     @Override
@@ -113,6 +114,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        reset(db);
+    }
+
+    @Override
+    public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         reset(db);
     }
 
