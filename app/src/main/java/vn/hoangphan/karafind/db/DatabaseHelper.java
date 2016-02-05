@@ -59,12 +59,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_INFO_UTF = "info_utf";
     public static final String COLUMN_STYPE = "stype";
     public static final String COLUMN_PASSWORD = "password";
+    public static final String COLUMN_SINGER = "singer";
 
     public static final int VALUE_TRUE = 1;
 
     public static final String CREATE_TABLE_DATA_LINKS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s integer default 0, %s integer default 0, %s text, %s text)";
 
-    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s text, %s text, %s integer, %s integer default 0, %s text)";
+    public static final String CREATE_TABLE_SONGS_SQL = "CREATE TABLE %s (%s integer primary key, %s integer, %s text, %s text, %s text, %s integer, %s integer default 0, %s text, %s text)";
     public static final String CREATE_TABLE_FTS_SEARCH_SQL = "CREATE VIRTUAL TABLE %s USING fts4 (%s)";
 
     public static final String ADD_UNIQUE_INDEX_SQL = "CREATE UNIQUE INDEX `index_%2$s_%1$s` ON `%1$s` (`%2$s` ASC)";
@@ -97,7 +98,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             String tableInfo = DatabaseUtils.getTableFTSInfoName(type);
             String tableName = DatabaseUtils.getTableName(type);
 
-            db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, tableName, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_ABBR));
+            db.execSQL(String.format(CREATE_TABLE_SONGS_SQL, tableName, COLUMN_ID, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_SINGER, COLUMN_ABBR));
             db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, tableLyrics, COLUMN_UTF));
             db.execSQL(String.format(CREATE_TABLE_FTS_SEARCH_SQL, tableInfo, COLUMN_INFO_UTF));
             db.execSQL(String.format(ADD_UNIQUE_INDEX_SQL, tableName, COLUMN_SONG_ID));
@@ -125,7 +126,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertSongs(List<Song> songs, String type) {
-        String insertSql = String.format("REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s) VALUES (?, ?, ?, ?, ?, ?, (SELECT %8$s FROM %1$s WHERE %2$s = ? LIMIT 1));", DatabaseUtils.getTableName(type), COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_ABBR, COLUMN_FAVORITED);
+        String insertSql = String.format("REPLACE INTO %1$s(%2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s, %9$s) VALUES (?, ?, ?, ?, ?, ?, ?, (SELECT %9$s FROM %1$s WHERE %2$s = ? LIMIT 1));", DatabaseUtils.getTableName(type), COLUMN_SONG_ID, COLUMN_NAME, COLUMN_LYRIC, COLUMN_AUTHOR, COLUMN_VOL, COLUMN_ABBR, COLUMN_SINGER, COLUMN_FAVORITED);
         String insertFtsLyricSql = String.format("REPLACE INTO %s(docid, %2$s) VALUES (?, ?);", DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF);
         String insertFtsInfoSql = String.format("REPLACE INTO %s(docid, %2$s) VALUES (?, ?);", DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF);
 
@@ -143,17 +144,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             insertStmt.bindString(4, song.getAuthor());
             insertStmt.bindLong(5, song.getVol());
             insertStmt.bindString(6, LanguageUtils.translateToUtf(LanguageUtils.getFirstLetters(song.getName())));
-            insertStmt.bindString(7, song.getId());
+            insertStmt.bindString(7, song.getSinger());
+            insertStmt.bindString(8, song.getId());
             insertStmt.execute();
 
-            insertLyricStmt.clearBindings();
-            insertLyricStmt.bindString(1, song.getId());
-            insertLyricStmt.bindString(2, LanguageUtils.translateToUtf(song.getLyric()));
-            insertLyricStmt.execute();
+            try {
+                insertLyricStmt.clearBindings();
+                insertLyricStmt.bindString(1, song.getId());
+                insertLyricStmt.bindString(2, LanguageUtils.translateToUtf(song.getLyric()));
+                insertLyricStmt.execute();
+            } catch (Exception e) {
+                Log.e("Exception ínsert", e.toString());
+                Log.e("Song", song.toString());
+                throw e;
+            }
 
             insertInfoStmt.clearBindings();
             insertInfoStmt.bindString(1, song.getId());
-            insertInfoStmt.bindString(2, LanguageUtils.translateToUtf(song.getName() + " " + song.getAuthor() + " " + song.getId()));
+            insertInfoStmt.bindString(2, LanguageUtils.translateToUtf(song.getQueryableInfo()));
             insertInfoStmt.execute();
         }
         db.setTransactionSuccessful();
@@ -204,37 +212,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String matchLyricSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSLyricName(type), COLUMN_UTF, "0");
         String matchSongSql = String.format(SELECT_FTS, DatabaseUtils.getTableFTSInfoName(type), COLUMN_INFO_UTF, "1");
 
-        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %1$s.%4$s, %1$s.%5$s, %1$s.%6$s, %1$s.%7$s, %1$s.%8$s, %1$s.%9$s FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%3$s UNION ALL %2$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), new String[]{ filter, filter });
+        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %1$s.%4$s, %1$s.%5$s, %1$s.%6$s, %1$s.%7$s, %1$s.%8$s, %1$s.%9$s, %1$s.%10$s FROM %1$s JOIN (SELECT docid, GROUP_CONCAT(rank) AS sum_rank, MIN(len) AS min_len FROM (%3$s UNION ALL %2$s) GROUP BY docid ORDER BY sum_rank DESC, min_len ASC LIMIT 20) fts ON %1$s.%4$s = fts.docid ORDER BY fts.sum_rank DESC, fts.min_len ASC limit 20", DatabaseUtils.getTableName(type), matchLyricSql, matchSongSql, COLUMN_SONG_ID, COLUMN_NAME, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_SINGER), new String[]{ filter, filter });
         return getSongs(res);
     }
 
     public List<Song> getSongsWithFirstLetters(String filter) {
-        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s WHERE %8$s LIKE ? ORDER BY LENGTH(%8$s) LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_ABBR), new String[] { filter + "%" });
+        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %9$s FROM %1$s WHERE %8$s LIKE ? ORDER BY LENGTH(%8$s) LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_ABBR, COLUMN_SINGER), new String[] { filter + "%" });
         return getSongs(res);
     }
 
     public List<Song> allSongs() {
-        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s ORDER BY %2$s LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), null);
+        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s FROM %1$s ORDER BY %2$s LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_SINGER), null);
         return getSongs(res);
     }
 
     public List<Song> favoritedSongs() {
-        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s FROM %1$s WHERE %7$s = ? ORDER BY %2$s LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED), new String[] { "1" });
+        Cursor res = getReadableDatabase().rawQuery(String.format("SELECT %2$s, %3$s, %4$s, %5$s, %6$s, %7$s, %8$s FROM %1$s WHERE %7$s = ? ORDER BY %2$s LIMIT 20", DatabaseUtils.getTableName(getCurrentType()), COLUMN_NAME, COLUMN_SONG_ID, COLUMN_AUTHOR, COLUMN_LYRIC, COLUMN_VOL, COLUMN_FAVORITED, COLUMN_SINGER), new String[] { "1" });
         return getSongs(res);
     }
 
-    public List<Song> getSongs(Cursor res) {
-        List<Song> songs = new ArrayList<>();
-        res.moveToFirst();
-
-        while (!res.isAfterLast()) {
-            songs.add(getSong(res));
-            res.moveToNext();
-        }
-        return songs;
+    public boolean isNoDataLink() {
+        Cursor cursor = getReadableDatabase().rawQuery(String.format("SELECT 1 AS COUNT FROM %s LIMIT 1", TABLE_DATA_LINKS), null);
+        boolean result = cursor.getCount() < 1;
+        cursor.close();
+        Log.e("result", result + "");
+        return result;
     }
 
-    public List<DataLink> nonUpdatedDataLinks() {
+    public List<DataLink> allDataLinks() {
         List<DataLink> dataLinks = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
@@ -247,6 +252,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         return dataLinks;
+    }
+
+    private List<Song> getSongs(Cursor res) {
+        List<Song> songs = new ArrayList<>();
+        res.moveToFirst();
+
+        while (!res.isAfterLast()) {
+            songs.add(getSong(res));
+            res.moveToNext();
+        }
+        return songs;
     }
 
     private void dropDb(SQLiteDatabase db) {
@@ -274,6 +290,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         song.setName(res.getString(res.getColumnIndex(COLUMN_NAME)));
         song.setLyric(res.getString(res.getColumnIndex(COLUMN_LYRIC)));
         song.setAuthor(res.getString(res.getColumnIndex(COLUMN_AUTHOR)));
+        song.setSinger(res.getString(res.getColumnIndex(COLUMN_SINGER)));
         song.setVol(res.getInt(res.getColumnIndex(COLUMN_VOL)));
         song.setFavorited(res.getInt(res.getColumnIndex(COLUMN_FAVORITED)) == VALUE_TRUE);
         return song;

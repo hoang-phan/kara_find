@@ -57,6 +57,7 @@ public class UpdateService extends IntentService {
                 try {
                     String link = dataLink.getLink();
                     String stype = dataLink.getStype();
+                    Log.d("Updating", "Vol " + vol + ". Type: " + stype);
                     URL url = new URL(link);
 
                     ZipFile zipFile = new ZipFile(createTempFile(url));
@@ -70,6 +71,7 @@ public class UpdateService extends IntentService {
                     int column_id = headers.indexOf("id"),
                             column_name = headers.indexOf("name"),
                             column_author = headers.indexOf("author"),
+                            column_singer = headers.indexOf("singer"),
                             column_lyric = headers.indexOf("lyric");
 
                     String[] parts;
@@ -80,12 +82,15 @@ public class UpdateService extends IntentService {
                         song.setId(parts[column_id]);
                         song.setName(parts[column_name]);
                         song.setAuthor(parts[column_author]);
+                        song.setSinger(parts[column_singer]);
                         song.setLyric(parts[column_lyric]);
                         song.setVol(vol);
                         songs.add(song);
                     }
 
                     reader.close();
+
+                    Log.d("Reading CSV", "completed");
 
                     DatabaseHelper.getInstance().insertSongs(songs, stype);
                     DatabaseHelper.getInstance().updateLinkVersion(dataLink);

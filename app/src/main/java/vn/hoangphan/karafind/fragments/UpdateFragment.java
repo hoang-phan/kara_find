@@ -58,7 +58,7 @@ public class UpdateFragment extends Fragment {
         mTvShowUpdated.setText(mAdapter.isShowUpdated() ? R.string.hide_updated : R.string.show_updated);
         mRvDataLinks.setAdapter(mAdapter);
         mRvDataLinks.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
+        mAdapter.setDataLinks(DatabaseHelper.getInstance().allDataLinks());
         mAdapter.notifyDataSetChanged();
         checkLinksUpdated();
         mTvShowUpdated.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +121,7 @@ public class UpdateFragment extends Fragment {
                     case Constants.INTENT_GET_DATA_LINKS_COMPLETED:
                         int label = intent.getIntExtra(Constants.VOL_LABEL, -1);
                         String type = intent.getStringExtra(Constants.TYPE);
-                        mAdapter.setDataLinks(DatabaseHelper.getInstance().nonUpdatedDataLinks());
+                        mAdapter.setDataLinks(DatabaseHelper.getInstance().allDataLinks());
                         if (label != -1) {
                             Toast.makeText(getActivity(), String.format(getString(R.string.updated_successfully), type + " - VOL " + label), Toast.LENGTH_SHORT).show();
                             if (mAdapter.notifyLinkUpdated(type, label)) {

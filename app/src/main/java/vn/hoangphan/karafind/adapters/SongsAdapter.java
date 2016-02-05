@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView.Adapter;
 import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,6 +44,13 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
         if (position < mSongs.size()) {
             final Song song = mSongs.get(position);
             holder.populate(song);
+            if (!TextUtils.isEmpty(song.getSinger())) {
+                holder.mTvAuthorSinger.setText(mActivity.getString(R.string.singer_ph) + song.getSinger());
+            } else if (!TextUtils.isEmpty(song.getAuthor())) {
+                holder.mTvAuthorSinger.setText(mActivity.getString(R.string.author_ph) + song.getAuthor());
+            } else {
+                holder.mTvAuthorSinger.setText(R.string.unknown_author);
+            }
             holder.mIvFavorited.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -72,7 +80,7 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
     }
 
     public static class SongHolder extends ViewHolder {
-        private TextView mTvId, mTvName, mTvLyric, mTvAuthor;
+        private TextView mTvId, mTvName, mTvLyric, mTvAuthorSinger;
         private ImageView mIvFavorited;
         private LinearLayout mLySongDetail;
 
@@ -81,15 +89,14 @@ public class SongsAdapter extends Adapter<SongsAdapter.SongHolder> {
             mTvId = (TextView)view.findViewById(R.id.tv_song_id);
             mTvName = (TextView)view.findViewById(R.id.tv_song_name);
             mTvLyric = (TextView)view.findViewById(R.id.tv_song_lyric);
-            mTvAuthor = (TextView)view.findViewById(R.id.tv_song_author);
+            mTvAuthorSinger = (TextView)view.findViewById(R.id.tv_song_author);
             mIvFavorited = (ImageView)view.findViewById(R.id.iv_song_favorite);
             mLySongDetail = (LinearLayout)view.findViewById(R.id.ly_song_detail);
         }
 
         public void populate(final Song song) {
             mTvId.setText(song.getId());
-            mTvName.setText(song.getName());
-            mTvAuthor.setText(song.getAuthor());
+            mTvName.setText(song.getName());;
             mTvLyric.setText(song.getLyric());
             mIvFavorited.setImageResource(song.isFavorited() ? R.drawable.ic_star : R.drawable.ic_star_off);
 
