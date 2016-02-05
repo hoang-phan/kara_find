@@ -3,6 +3,7 @@ package vn.hoangphan.karafind.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.text.TextUtils;
 
 import java.text.Normalizer;
 import java.util.Locale;
@@ -40,6 +41,9 @@ public class LanguageUtils {
     }
 
     public static String translateToUtf(String unicode) {
+        if (TextUtils.isEmpty(unicode)) {
+            return "";
+        }
         String temp = Normalizer.normalize(unicode, Normalizer.Form.NFD);
         Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
         return pattern.matcher(temp).replaceAll("").toUpperCase().replaceAll("[ĐÐ]", "D");

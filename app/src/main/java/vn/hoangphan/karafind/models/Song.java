@@ -10,6 +10,7 @@ public class Song {
     private String id;
     private String utf;
     private String stype;
+    private String singer;
 
     private boolean favorited;
 
@@ -79,6 +80,18 @@ public class Song {
         this.stype = stype;
     }
 
+    public String getSinger() {
+        return singer;
+    }
+
+    public void setSinger(String singer) {
+        this.singer = singer;
+    }
+
+    public String getQueryableInfo() {
+        return String.format("%s - %s - %s - %s", name, singer, author, id);
+    }
+
     @Override
     public String toString() {
         return "Song{" +
@@ -88,6 +101,7 @@ public class Song {
                 ", id='" + id + '\'' +
                 ", utf='" + utf + '\'' +
                 ", stype='" + stype + '\'' +
+                ", singer='" + singer + '\'' +
                 ", favorited=" + favorited +
                 ", vol=" + vol +
                 '}';

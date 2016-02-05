@@ -29,9 +29,6 @@ import vn.hoangphan.karafind.utils.PreferenceUtils;
 import vn.hoangphan.karafind.views.NonSwipeableViewPager;
 
 public class KaraokeActivity extends ActionBarActivity {
-    TabLayout mTabLayout;
-    NonSwipeableViewPager mPager;
-    PagerAdapter mAdapter;
     Locale mLocale = null;
 
     @Override
@@ -56,11 +53,16 @@ public class KaraokeActivity extends ActionBarActivity {
     }
 
     private void initConfigurations() {
-        DatabaseHelper.init(this);
         PreferenceUtils.init(this);
-        LanguageUtils.init(this);
-        CryptoUtils.init();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseHelper.init(KaraokeActivity.this);
+                CryptoUtils.init();
+            }
+        }).start();
 
+        LanguageUtils.init(KaraokeActivity.this);
         String language = PreferenceUtils.getInstance().getConfigString(Constants.PREFERRED_LANGUAGE);
 
         if (!TextUtils.isEmpty(language)) {
@@ -101,7 +103,7 @@ public class KaraokeActivity extends ActionBarActivity {
     private void proceed() {
         setContentView(R.layout.activity_karaoke);
         PagerUtils.init(this);
-        if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT))) {
+        if (!DateUtils.isToday(PreferenceUtils.getInstance().getConfigLong(Constants.LAST_FETCHED_AT)) || DatabaseHelper.getInstance().isNoDataLink()) {
             startService(new Intent(this, GetLinkService.class));
         }
     }

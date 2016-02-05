@@ -28,6 +28,9 @@
     <string name="show_updated"><u>Hiện các bản đã cập nhật</u></string>
     <string name="hide_updated"><u>Ẩn các bản đã cập nhật</u></string>
     <string name="no_service_available">Không tìm thấy dịch vụ! Vui lòng kiểm tra cài đặt của bạn.</string>
+    <string name="unknown_author">Chưa biết tác giả</string>
+    <string name="author_ph">"Tác giả: "</string>
+    <string name="singer_ph">"Ca sỹ: "</string>
     <string-array name="languages">
         <item>Tiếng Việt</item>
         <item>English</item>

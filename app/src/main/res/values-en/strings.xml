@@ -25,6 +25,9 @@
     <string name="font_default">fonts/windsor.ttf</string>
     <string name="no_song_find">No song was found</string>
     <string name="no_service_available">No service available! Please check yous settings</string>
+    <string name="unknown_author">Unknown author</string>
+    <string name="author_ph">"Author: "</string>
+    <string name="singer_ph">"Singer: "</string>
     <string-array name="languages">
         <item>Tiếng Việt</item>
         <item>English</item>
