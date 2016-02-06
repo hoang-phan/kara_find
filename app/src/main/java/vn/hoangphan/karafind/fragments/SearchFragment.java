@@ -29,6 +29,7 @@ import java.util.List;
 
 import vn.hoangphan.karafind.R;
 import vn.hoangphan.karafind.adapters.ModesAdapter;
+import vn.hoangphan.karafind.adapters.PagerAdapter;
 import vn.hoangphan.karafind.adapters.TypesAdapter;
 import vn.hoangphan.karafind.db.DatabaseHelper;
 import vn.hoangphan.karafind.models.Song;
@@ -179,7 +180,7 @@ public class SearchFragment extends BaseSongsFragment {
         mBtnToUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PagerUtils.getInstance().changePage(1);
+                PagerUtils.getInstance().changePage(PagerAdapter.TAB_UPDATE);
             }
         });
 
@@ -216,7 +217,7 @@ public class SearchFragment extends BaseSongsFragment {
             Toast.makeText(getActivity(), R.string.no_service_available, Toast.LENGTH_LONG).show();
         } else {
             Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi");
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Constants.LOCALE_VI);
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getResources().getString(R.string.say_words));
             startActivityForResult(intent, REQUEST_CODE);
         }

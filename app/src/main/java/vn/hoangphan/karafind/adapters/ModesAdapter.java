@@ -18,7 +18,7 @@ public class ModesAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return ALL_MODES.length;
     }
 
     @Override
